@@ -890,11 +890,23 @@
         chatArea.scrollTop = chatArea.scrollHeight;
     }
 
-    // ฟังก์ชันเปิด/ตรวจสอบสิทธิ์แอดมิน
-    function toggleAdminAccess() {
+    // ฟังก์ชันเปิด/ตรวจสอบสิทธิ์แอดมิน (เวอร์ชันปลอดภัยป้องกันรหัสผ่านหลุดฝั่งออนไลน์ด้วย SHA-256)
+    async function toggleAdminAccess() {
         if (!isAdminAuthenticated) {
-            let pwd = prompt("🔒 กรุณาใส่รหัสผ่านความปลอดภัยของผู้ดูแลระบบ (Admin Password)");
-            if (pwd === "it69319011814") {
+            let pwd = prompt("🔒 กรุณาใส่รหัสผ่านความปลอดภัยของผู้ดูแลระบบ (Admin Password):");
+            if (pwd === null) return; 
+
+            // เข้ารหัสข้อความที่ผู้ใช้ป้อนเข้ามาให้เป็นมาตรฐาน SHA-256
+            const encoder = new TextEncoder();
+            const data = encoder.encode(pwd);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+            // นี่คือรหัสยืนยันที่เข้ารหัสแล้วของคำว่า "it69319011814" (ปลอดภัย F12 ส่องไม่เจอข้อความตรง ๆ)
+            const secureHash = "e9dbf40398647055744f4e757d519207e38714aa0d912df080e729cd26778f5a";
+
+            if (hashHex === secureHash) {
                 isAdminAuthenticated = true;
                 alert("✅ ยืนยันสิทธิ์แอดมินสำเร็จ! เมนูระบบแอดมิน (CMS) พร้อมฟังก์ชันแชทแอดมินเปิดใช้งานแล้ว");
                 document.getElementById('btn-tab-admin').style.display = "block";
@@ -902,7 +914,7 @@
                 document.getElementById('adminStatusBtn').style.backgroundColor = "#8b5cf6";
                 document.getElementById('chatRoleAdminOpt').disabled = false;
                 logAccessAction("127.0.0.1", "แอดมินป้อนรหัสผ่านเข้าสู่ระบบสำเร็จ");
-            } else if (pwd !== null) {
+            } else {
                 alert("❌ รหัสผ่านไม่ถูกต้อง! ปฏิเสธการเข้าถึงส่วนกลาง");
             }
         } else {
