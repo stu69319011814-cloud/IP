@@ -559,7 +559,7 @@
         <div id="ipv4-tab" class="tab-content active">
             <div class="input-group">
                 <label for="ipv4-input">กรอกข้อมูล IPv4 ที่ต้องการคำนวณ</label>
-                <input type="text" id="ipv4-input" placeholder="เช่น 192.168.1.1, 194.17.10.0/27 หรือ เลขฐานสอง">
+                <input type="text" id="ipv4-input" placeholder="เช่น 192.168.1.1, 192.168.1.0/24 หรือ เลขฐานสอง">
                 <div class="help-text">รองรับ 3 รูปแบบ: เลขฐานสองสี่กลุ่ม, CIDR สแลชพรีฟิก (เช่น /24), หรือ IP ปกติเพื่อแปลงเป็นฐานสอง</div>
             </div>
             <button class="btn-calc" onclick="calculateIPv4()">วิเคราะห์และคำนวณ</button>
@@ -792,7 +792,7 @@
     let activeUsersDatabase = [
         { ip: "192.168.1.45", agent: "Chrome / Windows 11" },
         { ip: "172.20.10.3", agent: "Safari / iPhone iOS 17" },
-        { ip: "10.0.0.122", agent: "Firefox / MacOS Sequoia" }
+        { ip: "10.0.0.122", agent: "Firefox / MacOS" }
     ];
 
     let cachedHistoryRecords = [];
@@ -801,175 +801,274 @@
     window.onload = function() {
         renderCableContentData();
         renderActiveUsersData();
-        logAccessAction("127.0.0.1", "เข้าสู่หน้าเว็บ (เดสก์ท็อป)");
+        logAccessAction("127.0.0.1", "เข้าสู่หน้าเว็บหลัก (Online App Initialized)");
     };
 
-    // ฟังก์ชันช่วยนำอิโมจิไปต่อท้ายข้อความใน Input แชท
+    // ฟังก์ชันนำอิโมจิไปต่อท้ายข้อความใน Input แชท
     function appendEmojiToInput(emoji) {
         const input = document.getElementById('chatMessageInput');
         input.value += emoji;
         input.focus();
     }
 
-    // ฟังก์ชันจัดการบันทึก Access Logs แอดมิน
-    function logAccessAction(ip, activity) {
-        const container = document.getElementById('adminAccessLogs');
-        if (!container) return;
-        const now = new Date();
-        const timeStr = now.toLocaleTimeString('th-TH');
-        container.innerHTML += `[${timeStr}] IP: ${ip} -> ทำกิจกรรม: ${activity}<br>`;
-        container.scrollTop = container.scrollHeight;
+    // ฟังก์ชันสลับแท็บเมนู
+    function switchTab(tabId, el) {
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        el.classList.add('active');
     }
 
-    // ฟังก์ชันวาดตารางคนดูเว็บ (Active Users)
-    function renderActiveUsersData() {
-        const body = document.getElementById('adminUsersTableBody');
-        body.innerHTML = "";
-        if(activeUsersDatabase.length === 0) {
-            body.innerHTML = `<tr><td colspan="3" style="color:#a0aec0; padding:10px;">ไม่มีผู้ใช้คนอื่นออนไลน์อยู่ในขณะนี้</td></tr>`;
+    // ฟังก์ชันสลับสิทธิ์แอดมิน (จำลองระบบล็อกอินอย่างง่าย)
+    function toggleAdminAccess() {
+        isAdminAuthenticated = !isAdminAuthenticated;
+        const btnAdminTab = document.getElementById('btn-tab-admin');
+        const chatRoleAdminOpt = document.getElementById('chatRoleAdminOpt');
+        const badgeBtn = document.getElementById('adminStatusBtn');
+
+        if (isAdminAuthenticated) {
+            btnAdminTab.style.display = "block";
+            chatRoleAdminOpt.disabled = false;
+            badgeBtn.innerHTML = "🔓 สิทธิ์แอดมิน: เปิดใช้งาน";
+            badgeBtn.style.backgroundColor = "#48bb78";
+            logAccessAction("Localhost", "เปิดใช้งานสิทธิ์ผู้ดูแลระบบ (Admin Mode Active)");
+            alert("🔑 ปลดล็อกสิทธิ์แอดมินแล้ว! แท็บระบบแอดมิน (CMS) และการส่งข้อความสิทธิ์แอดมินพร้อมใช้งานแล้ว");
+        } else {
+            btnAdminTab.style.display = "none";
+            chatRoleAdminOpt.disabled = true;
+            document.getElementById('chatSenderRole').value = "ผู้ใช้ทั่วไป";
+            badgeBtn.innerHTML = "🔒 ตรวจสอบสิทธิ์แอดมิน";
+            badgeBtn.style.backgroundColor = "rgba(255, 255, 255, 0.2)";
+            if(document.getElementById('admin-tab').classList.contains('active')) {
+                switchTab('ipv4-tab', document.getElementById('btn-tab-ipv4'));
+            }
+        }
+    }
+
+    // ==========================================
+    // 1. ระบบคำนวณ IPv4 (IPv4 Calculator)
+    // ==========================================
+    function calculateIPv4() {
+        const input = document.getElementById('ipv4-input').value.trim();
+        const errorBox = document.getElementById('ipv4-error');
+        const resultBox = document.getElementById('ipv4-result');
+
+        errorBox.style.display = "none";
+        resultBox.style.display = "none";
+
+        if (!input) {
+            showError(errorBox, "กรุณากรอกข้อมูล IPv4 ก่อนทำการคำนวณ");
             return;
         }
-        activeUsersDatabase.forEach((user, index) => {
-            body.innerHTML += `<tr>
-                <td><strong>${user.ip}</strong></td>
-                <td>${user.agent}</td>
-                <td><button class="btn-action btn-del" onclick="banUserIP('${user.ip}', ${index})">🚫 แบน IP</button></td>
-            </tr>`;
-        });
+
+        // ตรวจสอบหากเป็นเลขฐานสองล้วนๆ เช่น 11000000.10101000.00000001.00000001
+        if (/^[01.]{35}$/.test(input)) {
+            const parts = input.split('.');
+            if (parts.length === 4) {
+                const ipNormal = parts.map(b => parseInt(b, 2)).join('.');
+                showIPv4Result("netmask-mode", "ผลการแปลงจากเลขฐานสอง", {
+                    "รูปแบบข้อความ": "แปลงเลขฐานสองเป็น IP ทศนิยมปกติ",
+                    "ผลลัพธ์ IP ทศนิยม": ipNormal,
+                    "ฐานสองเดิม": input
+                });
+                addHistoryRecord("type-netmask", `แปลงฐานสอง: ${ipNormal}`);
+                return;
+            }
+        }
+
+        // กรณีปกติ: เช็คแบบมี Subnet Mask (CIDR) หรือไม่ เช่น 192.168.1.5/24
+        const cidrMatch = input.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\/(\d{1,2})$/);
+        if (cidrMatch) {
+            const [_, o1, o2, o3, o4, prefixStr] = cidrMatch;
+            const prefix = parseInt(prefixStr);
+            if (o1>255 || o2>255 || o3>255 || o4>255 || prefix>32) {
+                showError(errorBox, "ตัวเลข IP หรือค่า Subnet Prefix (/0 ถึง /32) ไม่ถูกต้อง");
+                return;
+            }
+
+            // คำนวณหา Subnet Mask จาก Prefix
+            let maskBinary = "".padEnd(prefix, "1").padEnd(32, "0");
+            let m1 = parseInt(maskBinary.substr(0,8), 2);
+            let m2 = parseInt(maskBinary.substr(8,8), 2);
+            let m3 = parseInt(maskBinary.substr(16,8), 2);
+            let m4 = parseInt(maskBinary.substr(24,8), 2);
+            const subnetMask = `${m1}.${m2}.${m3}.${m4}`;
+
+            // คำนวณหา Network Address
+            let net1 = o1 & m1; let net2 = o2 & m2; let net3 = o3 & m3; let net4 = o4 & m4;
+            const networkAddress = `${net1}.${net2}.${net3}.${net4}`;
+
+            // คำนวณหา Broadcast Address
+            let bc1 = net1 | (255 - m1); let bc2 = net2 | (255 - m2); let bc3 = net3 | (255 - m3); let bc4 = net4 | (255 - m4);
+            const broadcastAddress = `${bc1}.${bc2}.${bc3}.${bc4}`;
+
+            // คำนวณจำนวน IP ที่ใช้ได้
+            const totalHosts = Math.pow(2, 32 - prefix);
+            const usableHosts = totalHosts > 2 ? totalHosts - 2 : 0;
+            
+            // หาช่วง IP ที่ใช้งานได้
+            let usableRange = "N/A";
+            if (usableHosts > 0) {
+                usableRange = `${net1}.${net2}.${net3}.${net4 + 1} ถึง ${bc1}.${bc2}.${bc3}.${bc4 - 1}`;
+            }
+
+            showIPv4Result("ip-mode", "วิเคราะห์โครงสร้าง IPv4 (CIDR)", {
+                "IP Address ที่ป้อน": `${o1}.${o2}.${o3}.${o4}`,
+                "Subnet Mask": `${subnetMask} (/${prefix})`,
+                "Network Address": networkAddress,
+                "Broadcast Address": broadcastAddress,
+                "ช่วง IP ที่ใช้งานได้ (Usable Host Range)": usableRange,
+                "จำนวนโฮสต์ทั้งหมดในระบบ": `${totalHosts.toLocaleString()} IPs (ใช้งานจริงได้ ${usableHosts.toLocaleString()} ตัว)`
+            });
+            addHistoryRecord("type-ipv4", `วิเคราะห์ CIDR: ${input}`);
+            return;
+        }
+
+        // กรณีเป็น IP ปกติไม่มี / เช่น 192.168.1.1 -> แปลงเป็นฐานสองให้ดู
+        const ipMatch = input.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+        if (ipMatch) {
+            const [_, o1, o2, o3, o4] = ipMatch.map(Number);
+            if (o1>255 || o2>255 || o3>255 || o4>255) {
+                showError(errorBox, "เลขอ็อกเท็ตของ IP Address ต้องไม่เกิน 255");
+                return;
+            }
+            const b1 = o1.toString(2).padStart(8,'0');
+            const b2 = o2.toString(2).padStart(8,'0');
+            const b3 = o3.toString(2).padStart(8,'0');
+            const b4 = o4.toString(2).padStart(8,'0');
+
+            showIPv4Result("ip-mode", "แปลงรูปแบบ IPv4 เป็นเลขฐานสอง", {
+                "IP Address (ฐานสิบ)": `${o1}.${o2}.${o3}.${o4}`,
+                "รูปแบบเลขฐานสอง (Binary)": `${b1}.${b2}.${b3}.${b4}`,
+                "คลาสไอพี (Class คาดเดา)": o1 <= 127 ? "Class A" : o1 <= 191 ? "Class B" : o1 <= 223 ? "Class C" : "Class D/E"
+            });
+            addHistoryRecord("type-ipv4", `แปลงฐานสิบเป็นฐานสอง: ${input}`);
+            return;
+        }
+
+        showError(errorBox, "รูปแบบข้อมูล IPv4 ไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง");
     }
 
-    // ฟังก์ชันแบนไอพีผู้ใช้ (Ban System)
-    function banUserIP(ip, index) {
-        if(confirm(`⚠️ คุณแน่ใจใช่ไหมที่จะทำตัดสิทธิ์และ "แบน IP: ${ip}" ออกจากระบบถาวร?`)) {
-            logAccessAction("SYSTEM", `ทำการแบนไอพีหมายเลข [ ${ip} ] สำเร็จ`);
-            activeUsersDatabase.splice(index, 1);
-            renderActiveUsersData();
-            alert(`🔒 ทำการสั่งแบนไอพี ${ip} เรียบร้อยแล้ว`);
+    function showIPv4Result(modeClass, title, dataObj) {
+        const box = document.getElementById('ipv4-result');
+        box.className = `result-box ${modeClass}`;
+        box.style.display = "block";
+        
+        let html = `<div class="result-title">🎯 ${title}</div>`;
+        for (let key in dataObj) {
+            html += `<div class="result-item"><strong>${key}:</strong> <span>${dataObj[key]}</span></div>`;
+        }
+        box.innerHTML = html;
+    }
+
+    // ==========================================
+    // 2. ระบบขยาย IPv6 (IPv6 Expanded)
+    // ==========================================
+    function calculateIPv6() {
+        const input = document.getElementById('ipv6-input').value.trim();
+        const errorBox = document.getElementById('ipv6-error');
+        const resultBox = document.getElementById('ipv6-result');
+
+        errorBox.style.display = "none";
+        resultBox.style.display = "none";
+
+        if (!input) {
+            showError(errorBox, "กรุณากรอกที่อยู่ IPv6 ก่อน");
+            return;
+        }
+
+        try {
+            let fullAddress = expandIPv6Address(input);
+            resultBox.className = "result-box ipv6-mode";
+            resultBox.style.display = "block";
+            resultBox.innerHTML = `
+                <div class="result-title">🎯 ผลลัพธ์การขยาย IPv6</div>
+                <div class="result-item"><strong>ค่าดั้งเดิมที่รับมา:</strong> <span>${input}</span></div>
+                <div class="result-item"><strong>รูปแบบเต็ม (Expanded):</strong> <span style="color:#8e24aa; font-family:monospace; font-weight:bold;">${fullAddress}</span></div>
+                <div class="result-item"><strong>โครงสร้างรวม:</strong> <span>ประกอบด้วย 8 กลุ่มย่อย (กลุ่มละ 16 บิต รวมเป็น 128 บิต)</span></div>
+            `;
+            addHistoryRecord("type-ipv6", `ขยาย IPv6: ${input}`);
+        } catch (e) {
+            showError(errorBox, e.message);
         }
     }
 
-    // ฟังก์ชันปล่อยประกาศหน้าเว็บ (Announcement)
-    function publishAnnouncement() {
-        const msg = document.getElementById('admAnnounceInput').value.trim();
-        if(!msg) { alert("กรุณาใส่ข้อความประกาศ"); return; }
-        document.getElementById('announcementText').innerText = "📢 " + msg;
-        document.getElementById('topAnnouncementBanner').style.display = "flex";
-        logAccessAction("ADMIN", `แก้ไขข้อความประกาศส่วนหัว: "${msg}"`);
-        document.getElementById('admAnnounceInput').value = "";
-    }
-
-    // ฟังก์ชันส่งอีเมลผ่านหลังบ้าน (Email Dispatch)
-    function dispatchAdminEmail() {
-        const email = document.getElementById('admEmailTarget').value.trim();
-        const content = document.getElementById('admEmailContent').value.trim();
-        if(!email || !content) { alert("กรุณากรอกข้อมูลเมลปลายทางและเนื้อหาให้ครบถ้วน"); return; }
-        
-        alert(`📧 ส่งจดหมายข่าวจำลองสำเร็จ!\nTo: ${email}\nStatus: Sent via Mail Server`);
-        logAccessAction("ADMIN", `ส่งอีเมลจดหมายข่าวไปยังกล่องข้อความ: ${email}`);
-        document.getElementById('admEmailTarget').value = "";
-        document.getElementById('admEmailContent').value = "";
-    }
-
-    // ฟังก์ชันคุยในระบบแชท (Chat System)
-    function sendChatMessage() {
-        const role = document.getElementById('chatSenderRole').value;
-        const msgInput = document.getElementById('chatMessageInput');
-        const message = msgInput.value.trim();
-        if(!message) return;
-
-        const chatArea = document.getElementById('chatLogsArea');
-        const msgClass = (role === "แอดมินระบบ") ? "admin" : "user";
-        
-        const msgElement = document.createElement('div');
-        msgElement.className = `chat-msg ${msgClass}`;
-        msgElement.innerHTML = `<strong>${role}:</strong> ${message}`;
-        chatArea.appendChild(msgElement);
-        
-        logAccessAction(role === "แอดมินระบบ" ? "ADMIN" : "CLIENT", `ส่งข้อความแชท: "${message}"`);
-        msgInput.value = "";
-        chatArea.scrollTop = chatArea.scrollHeight;
-    }
-
-    // 🔥 ฟังก์ชันเปิด/ตรวจสอบสิทธิ์แอดมิน เวอร์ชันเข้ารหัสแบบไม่หลุดบนออนไลน์
-    async function toggleAdminAccess() {
-        if (!isAdminAuthenticated) {
-            let pwd = prompt("🔒 กรุณาใส่รหัสผ่านความปลอดภัยของผู้ดูแลระบบ (Admin Password):");
-            if (pwd === null) return; 
-
-            // ทำการแปลงข้อความรหัสผ่านที่กรอกเข้ามาด้วยอัลกอริทึม SHA-256
-            const encoder = new TextEncoder();
-            const data = encoder.encode(pwd);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-
-            // ค่าแฮช (SHA-256) ของรหัสผ่าน "it69319011814" 
-            const secureHash = "e9dbf40398647055744f4e757d519207e38714aa0d912df080e729cd26778f5a";
-
-            if (hashHex === secureHash) {
-                isAdminAuthenticated = true;
-                alert("✅ ยืนยันสิทธิ์แอดมินสำเร็จ! เมนูระบบแอดมิน (CMS) พร้อมฟังก์ชันแชทแอดมินเปิดใช้งานแล้ว");
-                document.getElementById('btn-tab-admin').style.display = "block";
-                document.getElementById('adminStatusBtn').innerHTML = "🔓 บัญชีแอดมินล็อกอินอยู่";
-                document.getElementById('adminStatusBtn').style.backgroundColor = "#8b5cf6";
-                document.getElementById('chatRoleAdminOpt').disabled = false;
-                logAccessAction("127.0.0.1", "แอดมินป้อนรหัสผ่านเข้าสู่ระบบสำเร็จ");
-            } else {
-                alert("❌ รหัสผ่านไม่ถูกต้อง! ปฏิเสธการเข้าถึงส่วนกลาง");
-            }
-        } else {
-            let logoutConfirm = confirm("คุณต้องการออกจากระบบเซสชันแอดมินใช่หรือไม่?");
-            if (logoutConfirm) {
-                isAdminAuthenticated = false;
-                document.getElementById('btn-tab-admin').style.display = "none";
-                document.getElementById('adminStatusBtn').innerHTML = "🔒 ตรวจสอบสิทธิ์แอดมิน";
-                document.getElementById('adminStatusBtn').style.backgroundColor = "rgba(255, 255, 255, 0.2)";
-                document.getElementById('chatRoleAdminOpt').disabled = true;
-                document.getElementById('chatSenderRole').value = "ผู้ใช้ทั่วไป";
-                switchTab('ipv4-tab', document.getElementById('btn-tab-ipv4'));
-                logAccessAction("127.0.0.1", "แอดมินออกจากระบบเซสชัน");
-            }
+    function expandIPv6Address(address) {
+        // ตรวจสอบความถูกต้องเบื้องต้น
+        if (!/^[0-9a-fA-F:]+$/.test(address) || address.includes(":::")) {
+            throw new Error("รูปแบบตัวอักษร IPv6 ไม่ถูกต้อง");
         }
+
+        let parts = address.split(':');
+        
+        // จัดการกรณีที่มี :: อยู่ในข้อความ
+        if (address.includes("::")) {
+            const countDoubleColon = (address.match(/::/g) || []).length;
+            if (countDoubleColon > 1) throw new Error("ไม่สามารถใช้ '::' ซ้ำซ้อนเกิน 1 ครั้งได้");
+
+            let left = address.split("::")[0].split(":").filter(x => x !== "");
+            let right = address.split("::")[1].split(":").filter(x => x !== "");
+            let missingCount = 8 - (left.length + right.length);
+            
+            let middle = Array(missingCount).fill("0000");
+            parts = [...left, ...middle, ...right];
+        Part}
+
+        if (parts.length !== 8) {
+            throw new Error("ขนาดโครงสร้างของเลข IPv6 ขาดหรือเกิน 8 กลุ่มย่อย");
+        }
+
+        // แปลงทุกกลุ่มให้เติมศูนย์ข้างหน้าครบ 4 หลัก
+        return parts.map(part => {
+            if (part.length > 4) throw new Error("ข้อมูลในบางกลุ่มย่อยเกิน 4 หลัก Hex");
+            return part.toLowerCase().padStart(4, '0');
+        }).join(':');
     }
 
-    // ฟังก์ชันวาดเนื้อหาสายสัญญาณขึ้นสู่หน้าบ้านและตารางแอดมิน
+    function showError(box, msg) {
+        box.innerText = `⚠️ ข้อผิดพลาด: ${msg}`;
+        box.style.display = "block";
+    }
+
+    // ==========================================
+    // 3. ระบบแสดงผลข้อมูลและจัดการสายแลน (CMS UI)
+    // ==========================================
     function renderCableContentData() {
-        const webTableBody = document.getElementById('webCableTableBody');
-        const adminTableBody = document.getElementById('adminCableControlBody');
+        const webTable = document.getElementById('webCableTableBody');
+        const adminTable = document.getElementById('adminCableControlBody');
         
-        webTableBody.innerHTML = "";
-        adminTableBody.innerHTML = "";
+        webTable.innerHTML = "";
+        adminTable.innerHTML = "";
 
-        cableDatabase.forEach(item => {
-            if (item.isVisible) {
-                let row = `<tr>
-                    <td><strong>${item.name}</strong></td>
-                    <td>${item.speed}</td>
-                    <td>${item.bandwidth}</td>
-                    <td>${item.distance}</td>
-                </tr>`;
-                webTableBody.innerHTML += row;
+        cableDatabase.forEach((cable) => {
+            // แสดงเฉพาะที่เปิดให้เห็น (isVisible === true) บนหน้าเว็บผู้ใช้ทั่วไป
+            if (cable.isVisible) {
+                webTable.innerHTML += `
+                    <tr>
+                        <td><strong>${cable.name}</strong></td>
+                        <td>${cable.speed}</td>
+                        <td>${cable.bandwidth}</td>
+                        <td>${cable.distance}</td>
+                    </tr>
+                `;
             }
 
-            let statusBadge = item.isVisible ? 
-                `<span class="badge-status status-show">เปิดแสดงผล</span>` : 
-                `<span class="badge-status status-hide">ปิดซ่อน</span>`;
-                
-            let toggleBtnText = item.isVisible ? "👁️‍🗨️ ปิดโชว์" : "👁️ เปิดโชว์";
-
-            let adminRow = `<tr>
-                <td><strong>${item.name}</strong></td>
-                <td>${item.speed}</td>
-                <td>${statusBadge}</td>
-                <td>
-                    <button class="btn-action btn-toggle-view" onclick="toggleCableVisibility(${item.id})">${toggleBtnText}</button>
-                    <button class="btn-action btn-del" onclick="deleteCableItem(${item.id})">🗑️ ลบ</button>
-                </td>
-            </tr>`;
-            adminTableBody.innerHTML += adminRow;
+            // ส่วนของแอดมินแสดงทุกรายการและมีปุ่มควบคุม
+            adminTable.innerHTML += `
+                <tr>
+                    <td><strong>${cable.name}</strong></td>
+                    <td>${cable.speed}</td>
+                    <td><span class="badge-status ${cable.isVisible ? 'status-show' : 'status-hide'}">${cable.isVisible ? 'แสดง' : 'ซ่อน'}</span></td>
+                    <td>
+                        <button class="btn-action btn-toggle-view" onclick="toggleCableVisibility(${cable.id})">👁️ สลับสถานะ</button>
+                        <button class="btn-action btn-del" onclick="deleteCableRecord(${cable.id})">🗑️ ลบ</button>
+                    </td>
+                </tr>
+            `;
         });
     }
 
+    // ฟังก์ชันเพิ่มข้อมูลสายสัญญาณใหม่โดยแอดมิน
     function addNewCableContent() {
         const name = document.getElementById('admCatName').value.trim();
         const speed = document.getElementById('admCatSpeed').value.trim();
@@ -977,233 +1076,180 @@
         const distance = document.getElementById('admCatDistance').value.trim();
 
         if (!name || !speed || !bandwidth || !distance) {
-            alert("⚠️ กรุณากรอกข้อมูลในช่องว่างให้ครบถ้วนทุกช่อง");
+            alert("กรุณากรอกข้อมูลสายเครือข่ายใหม่ให้ครบทุกช่องก่อนกดบันทึก!");
             return;
         }
 
-        let newId = cableDatabase.length > 0 ? Math.max(...cableDatabase.map(o => o.id)) + 1 : 1;
-        cableDatabase.push({ id: newId, name: name, speed: speed, bandwidth: bandwidth, distance: distance, isVisible: true });
-
+        const newId = cableDatabase.length > 0 ? Math.max(...cableDatabase.map(o => o.id)) + 1 : 1;
+        cableDatabase.push({ id: newId, name, speed, bandwidth, distance, isVisible: true });
+        
+        // ล้างค่าในช่องรับข้อมูล
         document.getElementById('admCatName').value = "";
         document.getElementById('admCatSpeed').value = "";
         document.getElementById('admCatBandwidth').value = "";
         document.getElementById('admCatDistance').value = "";
 
-        alert(`เพิ่มเนื้อหาของสายแลน ${name} เรียบร้อย!`);
-        logAccessAction("ADMIN", `เพิ่มข้อมูลสายแลนชุดใหม่เข้าไปในระบบ: ${name}`);
         renderCableContentData();
+        logAccessAction("CMS", `เพิ่มสายสัญญาณประเภทใหม่สำเร็จ: ${name}`);
+        alert(`💾 เพิ่มข้อมูลสายเครือข่าย ${name} เรียบร้อยแล้ว`);
     }
 
     function toggleCableVisibility(id) {
-        let index = cableDatabase.findIndex(x => x.id === id);
-        if (index !== -1) {
-            cableDatabase[index].isVisible = !cableDatabase[index].isVisible;
-            logAccessAction("ADMIN", `เปลี่ยนการมองเห็นสายแลน ID: ${id} เป็น: ${cableDatabase[index].isVisible}`);
+        const target = cableDatabase.find(c => c.id === id);
+        if (target) {
+            target.isVisible = !target.isVisible;
             renderCableContentData();
+            logAccessAction("CMS", `เปลี่ยนการมองเห็นของ ${target.name} เป็น: ${target.isVisible ? 'แสดงผล' : 'ซ่อนไว้'}`);
         }
     }
 
-    function deleteCableItem(id) {
-        if(confirm("คุณแน่ใจหรือไม่ว่าต้องการลบเนื้อหานี้ถาวร?")) {
-            cableDatabase = cableDatabase.filter(x => x.id !== id);
-            logAccessAction("ADMIN", `ลบข้อมูลสายแลนไอดีออกจากฐานข้อมูล: ${id}`);
+    function deleteCableRecord(id) {
+        const target = cableDatabase.find(c => c.id === id);
+        if (target && confirm(`คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลของ ${target.name} ออกถาวร?`)) {
+            cableDatabase = cableDatabase.filter(c => c.id !== id);
             renderCableContentData();
+            logAccessAction("CMS", `ลบข้อมูลสายสัญญาณ ID: ${id}`);
         }
     }
 
-    function switchTab(tabId, element) {
-        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-        element.classList.add('active');
-        logAccessAction("CLIENT", `ผู้ใช้เปลี่ยนไปเปิดใช้งานแท็บเมนู: ${tabId}`);
+    // ==========================================
+    // 4. ระบบจัดการสมาชิกและบันทึกล็อก (Access Logs)
+    // ==========================================
+    function renderActiveUsersData() {
+        const tbody = document.getElementById('adminUsersTableBody');
+        tbody.innerHTML = "";
+        activeUsersDatabase.forEach(u => {
+            tbody.innerHTML += `
+                <tr>
+                    <td style="font-family:monospace;">${u.ip}</td>
+                    <td style="font-size:12px; text-align:left;">${u.agent}</td>
+                    <td><button class="btn-action btn-del" onclick="banSimulatedUserIP('${u.ip}')">🚫 แบนผู้ใช้</button></td>
+                </tr>
+            `;
+        });
     }
 
-    function showError(element, message) {
-        element.innerHTML = message;
-        element.style.display = 'block';
+    function banSimulatedUserIP(ip) {
+        if(confirm(`คุณต้องการจำลองการเตะและแบนที่อยู่ IP: ${ip} ใช่หรือไม่?`)) {
+            activeUsersDatabase = activeUsersDatabase.filter(user => user.ip !== ip);
+            renderActiveUsersData();
+            logAccessAction("FIREWALL", `แบนและจำกัดสิทธิ์การเข้าถึงของ IP: ${ip}`);
+            alert(`🚫 บันทึกกฎไฟร์วอลล์ สั่งบล็อก IP: ${ip} สำเร็จ`);
+        }
     }
 
-    const getIpClass = (firstOctet) => {
-        if (firstOctet >= 1 && firstOctet <= 126) return "Class A";
-        if (firstOctet === 127) return "Class A (Loopback)";
-        if (firstOctet >= 128 && firstOctet <= 191) return "Class B";
-        if (firstOctet >= 192 && firstOctet <= 223) return "Class C";
-        return "Other";
-    };
+    function logAccessAction(operator, actionText) {
+        const logBox = document.getElementById('adminAccessLogs');
+        const timeNow = new Date().toLocaleTimeString();
+        logBox.innerHTML += `<div>[${timeNow}] <span style="color:#d97706;font-weight:bold;">[${operator}]</span> ${actionText}</div>`;
+        logBox.scrollTop = logBox.scrollHeight;
+    }
 
-    function addRecordToHistory(inputType, inputData, summaryInfo, resultBoxHTML, modeClassName) {
-        const historyList = document.getElementById('history-list');
-        const noHistory = historyList.querySelector('.no-history');
-        if (noHistory) noHistory.remove();
+    function publishAnnouncement() {
+        const text = document.getElementById('admAnnounceInput').value.trim();
+        const banner = document.getElementById('topAnnouncementBanner');
+        const bannerText = document.getElementById('announcementText');
 
-        const now = new Date();
-        const timeString = now.toLocaleTimeString('th-TH') + ' น.';
-        const recordId = 'rec_' + Date.now();
+        if (!text) {
+            alert("กรุณากรอกรายละเอียดเพื่อประกาศ");
+            return;
+        }
 
-        cachedHistoryRecords.push({ id: recordId, tabType: (inputType === 'ipv6') ? 'ipv6' : 'ipv4', modeClass: modeClassName, html: resultBoxHTML });
-        let typeClass = (inputType === 'netmask') ? 'type-netmask' : (inputType === 'ipv4') ? 'type-ipv4' : 'type-ipv6';
+        bannerText.innerText = `📢 ประกาศระบบ: ${text}`;
+        banner.style.display = "flex";
+        document.getElementById('admAnnounceInput').value = "";
+        logAccessAction("ANNOUNCE", `เปลี่ยนป้ายประกาศเว็บเป็น: "${text}"`);
+    }
 
-        const item = document.createElement('div');
-        item.className = `history-item ${typeClass}`;
-        item.innerHTML = `
-            <div>
-                <strong>📥 อินพุต:</strong> ${inputData} | 📝 สรุป: ${summaryInfo} <span style="color:#888; font-size:11px;">(${timeString})</span>
+    function dispatchAdminEmail() {
+        const target = document.getElementById('admEmailTarget').value.trim();
+        const content = document.getElementById('admEmailContent').value.trim();
+
+        if (!target || !content) {
+            alert("กรุณาระบุอีเมลเป้าหมายและเนื้อหาจดหมายข่าวให้ครบถ้วน");
+            return;
+        }
+
+        logAccessAction("MAILER", `ส่งอีเมลจดหมายข่าวไปยัง ${target}`);
+        alert(`🚀 [ระบบเครือข่ายจำลอง] ทำการส่งข้อมูลไปยัง ${target} สำเร็จแล้ว!\n(จำลองสถานะ: SMTP 200 OK)`);
+        document.getElementById('admEmailTarget').value = "";
+        document.getElementById('admEmailContent').value = "";
+    }
+
+    // ==========================================
+    // 5. ระบบ Live Chat สื่อสารจำลอง (Interactive)
+    // ==========================================
+    function sendChatMessage() {
+        const input = document.getElementById('chatMessageInput');
+        const msg = input.value.trim();
+        const role = document.getElementById('chatSenderRole').value;
+        const chatArea = document.getElementById('chatLogsArea');
+
+        if (!msg) return;
+
+        const isUser = (role === "ผู้ใช้ทั่วไป");
+        const bubbleClass = isUser ? "user" : "admin";
+        const senderTag = isUser ? "👤 คุณ" : "🔑 แอดมินระบบ";
+
+        chatArea.innerHTML += `
+            <div class="chat-msg ${bubbleClass}">
+                <strong>${senderTag}:</strong> ${msg}
             </div>
-            <button class="btn-view-old-record" onclick="loadOldRecord('${recordId}')">ดูย้อนหลัง</button>
         `;
-        historyList.insertBefore(item, historyList.firstChild);
-        logAccessAction("CALCULATOR", `ประมวลผลคำนวณข้อมูลเครือข่ายสำเร็จ (${summaryInfo})`);
+
+        input.value = "";
+        chatArea.scrollTop = chatArea.scrollHeight;
+
+        // บอตช่วยตอบโต้อัตโนมัติในฝั่งออนไลน์ (Simulated Chat Bot Reply)
+        if (isUser) {
+            setTimeout(() => {
+                let botAnswer = "ได้รับข้อมูลแล้วค่ะ! หากมีปัญหาเรื่องการคำนวณซับเน็ต หรือมาตรฐานการเข้าหัวสาย LAN สอบถามทิ้งไว้ได้เลยนะคะ 🌐";
+                if(msg.toLowerCase().includes("ipv4") || msg.includes("คำนวณ")) {
+                    botAnswer = "หากต้องการคำนวณ IPv4 ลองกรอกเลข IP ตามด้วย /Prefix เช่น 192.168.1.0/24 ในแท็บแรกได้เลยนะคะ ระบบคำนวณออโต้ทันทีค่ะ";
+                } else if(msg.includes("สายแลน") || msg.includes("cat")) {
+                    botAnswer = "ปัจจุบันสาย LAN ที่นิยมสูงสุดในบ้านพักทั่วไปคือ Cat 6 รองรับความเร็ว 10 Gbps ในระยะทางสั้น และมาตรฐานการต่อส่วนใหญ่คือ T568B ค่ะ";
+                }
+                chatArea.innerHTML += `
+                    <div class="chat-msg user" style="background-color: #ebf8ff; border-left: 3px solid #3182ce;">
+                        <strong>🤖 บอตช่วยเหลือ:</strong> ${botAnswer}
+                    </div>
+                `;
+                chatArea.scrollTop = chatArea.scrollHeight;
+            }, 800);
+        }
     }
 
-    function loadOldRecord(recordId) {
-        const record = cachedHistoryRecords.find(r => r.id === recordId);
-        if (!record) return;
+    // ==========================================
+    // 6. ระบบบันทึกประวัติการใช้ (Session History)
+    // ==========================================
+    function addHistoryRecord(typeClass, textDesc) {
+        const listEl = document.getElementById('history-list');
+        const noHist = listEl.querySelector('.no-history');
+        if (noHist) noHist.remove();
 
-        if (record.tabType === 'ipv4') {
-            switchTab('ipv4-tab', document.getElementById('btn-tab-ipv4'));
-            const resBox = document.getElementById('ipv4-result');
-            resBox.className = 'result-box ' + record.modeClass;
-            resBox.innerHTML = record.html;
-            resBox.style.display = 'block';
-            document.getElementById('ipv4-error').style.display = 'none';
-        } else {
-            switchTab('ipv6-tab', document.getElementById('btn-tab-ipv6'));
-            const resBox = document.getElementById('ipv6-result');
-            resBox.className = 'result-box ' + record.modeClass;
-            resBox.innerHTML = record.html;
-            resBox.style.display = 'block';
-            document.getElementById('ipv6-error').style.display = 'none';
-        }
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        const timestamp = new Date().toLocaleTimeString();
+        const recordId = cachedHistoryRecords.length;
+        
+        cachedHistoryRecords.push({ id: recordId, type: typeClass, desc: textDesc, time: timestamp });
+
+        const itemHtml = `
+            <div class="history-item ${typeClass}" id="record-item-${recordId}">
+                <div>
+                    <span style="font-weight:bold; color:#718096; margin-right:8px;">[${timestamp}]</span>
+                    <span>${textDesc}</span>
+                </div>
+                <button class="btn-view-old-record" onclick="alert('บันทึกเซสชันประจำครั้งนี้:\\n[เวลา] ${timestamp}\\n[รายละเอียด] ${textDesc}')">🔍 เปิดดู</button>
+            </div>
+        `;
+        listEl.insertAdjacentHTML('afterbegin', itemHtml);
     }
 
     function clearHistory() {
-        document.getElementById('history-list').innerHTML = `<div class="no-history">ยังไม่มีประวัติการคำนวณในเซสชันนี้</div>`;
-        cachedHistoryRecords = [];
-    }
-
-    function calculateIPv4() {
-        const inputElement = document.getElementById('ipv4-input');
-        const resultBox = document.getElementById('ipv4-result');
-        const errorBox = document.getElementById('ipv4-error');
-        
-        resultBox.style.display = 'none';
-        errorBox.style.display = 'none';
-        const content = inputElement.value.replace(/\s/g, "");
-
-        if (!content) { showError(errorBox, "กรุณากรอกข้อมูลอินพุต"); return; }
-
-        if (/^[01.]+$/.test(content) && content.split('.').length === 4) {
-            const parts = content.split('.');
-            let totalOnes = 0; let isNetmask = true; let previousBit = '1';
-
-            const decimalParts = parts.map((part) => {
-                if(part.length !== 8) isNetmask = false; 
-                const bits = part.split(''); const weights = [128, 64, 32, 16, 8, 4, 2, 1];
-                let sum = 0;
-                bits.forEach((bit, i) => {
-                    if (isNetmask) {
-                        if (previousBit === '0' && bit === '1') isNetmask = false;
-                        if (bit === '1') totalOnes++;
-                        previousBit = bit;
-                    }
-                    if (bit === '1') { sum += weights[i]; }
-                });
-                return sum;
-            });
-
-            const ipResult = decimalParts.join('.');
-            if (isNetmask && totalOnes > 0 && totalOnes <= 32) {
-                const usableHosts = totalOnes >= 31 ? 0 : Math.pow(2, 32 - totalOnes) - 2;
-                resultBox.className = 'result-box netmask-mode';
-                resultBox.innerHTML = `
-                    <div class="result-title">🎛️ Netmask Binary Result</div>
-                    <div class="result-item"><strong>Subnet Mask:</strong> ${ipResult} (/${totalOnes})</div>
-                    <div class="result-item"><strong>Usable Hosts:</strong> ${usableHosts.toLocaleString()} Hosts</div>
-                `;
-                resultBox.style.display = 'block';
-                addRecordToHistory('netmask', content, `Subnet Mask: ${ipResult}`, resultBox.innerHTML, 'netmask-mode');
-            } else {
-                let ipClass = getIpClass(decimalParts[0]);
-                resultBox.className = 'result-box ip-mode';
-                resultBox.innerHTML = `
-                    <div class="result-title">🖥️ Binary to Decimal Result</div>
-                    <div class="result-item"><strong>Result IP:</strong> ${ipResult} [${ipClass}]</div>
-                `;
-                resultBox.style.display = 'block';
-                addRecordToHistory('ipv4', content, `แปลงได้ IP: ${ipResult}`, resultBox.innerHTML, 'ip-mode');
-            }
-        } else if (/^(\d{1,3}\.){3}\d{1,3}\/([0-9]|[1-2][0-9]|3[0-2])$/.test(content)) {
-            const [ip, mask] = content.split('/'); const ipParts = ip.split('.').map(Number); const prefix = parseInt(mask);
-            if (ipParts.some(num => num > 255)) { showError(errorBox, "IP Octet ห้ามเกิน 255"); return; }
-            
-            const maskLong = (prefix === 0) ? 0 : (0xFFFFFFFF << (32 - prefix)) >>> 0;
-            const subnetMask = [(maskLong >>> 24) & 0xFF, (maskLong >>> 16) & 0xFF, (maskLong >>> 8) & 0xFF, maskLong & 0xFF].join('.');
-            
-            resultBox.className = 'result-box ip-mode';
-            resultBox.innerHTML = `
-                <div class="result-title">🌐 CIDR Subnet Result</div>
-                <div class="result-item"><strong>Subnet Mask:</strong> ${subnetMask}</div>
-                <div class="result-item"><strong>Prefix Length:</strong> /${prefix}</div>
-            `;
-            resultBox.style.display = 'block';
-            addRecordToHistory('ipv4', content, `Mask: ${subnetMask}`, resultBox.innerHTML, 'ip-mode');
-        } else if (/^(\d{1,3}\.){3}\d{1,3}$/.test(content)) {
-            const ipParts = content.split('.').map(Number);
-            if (ipParts.some(num => num > 255)) { showError(errorBox, "IP Octet ห้ามเกิน 255"); return; }
-            const binaryResult = ipParts.map(p => p.toString(2).padStart(8, '0')).join('.');
-            
-            resultBox.className = 'result-box ip-mode';
-            resultBox.innerHTML = `
-                <div class="result-title">🖥️ IPv4 to Binary</div>
-                <div class="result-item"><strong>Binary Output:</strong> ${binaryResult}</div>
-            `;
-            resultBox.style.display = 'block';
-            addRecordToHistory('ipv4', content, "แปลงเป็นเลขฐานสองสำเร็จ", resultBox.innerHTML, 'ip-mode');
-        } else {
-            showError(errorBox, "รูปแบบข้อมูล IPv4 ไม่ถูกต้อง");
+        if (confirm("คุณแน่ใจที่จะล้างประวัติการคำนวณทั้งหมดในเซสชันนี้?")) {
+            cachedHistoryRecords = [];
+            document.getElementById('history-list').innerHTML = `<div class="no-history">ยังไม่มีประวัติการคำนวณในเซสชันนี้</div>`;
+            logAccessAction("SYSTEM", "สั่งล้างข้อมูลประวัติคำนวณในหน้าสถิติ");
         }
-    }
-
-    function calculateIPv6() {
-        const inputElement = document.getElementById('ipv6-input');
-        const resultBox = document.getElementById('ipv6-result');
-        const errorBox = document.getElementById('ipv6-error');
-        
-        resultBox.style.display = 'none';
-        errorBox.style.display = 'none';
-        let content = inputElement.value.trim().toLowerCase();
-
-        if (!content) { showError(errorBox, "กรุณากรอกข้อมูล IPv6"); return; }
-
-        if (!/^[0-9a-f:]+$/.test(content) || content.includes(':::') || (content.match(/::/g) || []).length > 1) {
-            showError(errorBox, "รูปแบบโครงสร้าง IPv6 ไม่ถูกต้อง"); return;
-        }
-
-        let blocks = content.split(':');
-        if (content.includes('::')) {
-            let cleanBlocks = blocks.filter(b => b !== '');
-            let missingCount = 8 - cleanBlocks.length;
-            let expandedStr = content.replace('::', ':' + '0000:'.repeat(missingCount));
-            if (expandedStr.startsWith(':')) expandedStr = expandedStr.slice(1);
-            if (expandedStr.endsWith(':')) expandedStr = expandedStr.slice(0, -1);
-            blocks = expandedStr.split(':');
-        }
-
-        if (blocks.length !== 8 || blocks.some(b => b.length > 4)) {
-            showError(errorBox, "ความยาวกลุ่มย่อยหรือจำนวนกลุ่ม IPv6 ไม่ถูกต้อง"); return;
-        }
-
-        const fullIPv6 = blocks.map(b => b.padStart(4, '0')).join(':');
-
-        resultBox.className = 'result-box ipv6-mode';
-        resultBox.innerHTML = `
-            <div class="result-title">🔮 IPv6 Expanded Result</div>
-            <div class="result-item"><strong>Full Expanded Form:</strong> ${fullIPv6}</div>
-        `;
-        resultBox.style.display = 'block';
-        addRecordToHistory('ipv6', content, "ขยายเลข IPv6 สำเร็จ", resultBox.innerHTML, 'ipv6-mode');
     }
 </script>
 
