@@ -23,10 +23,25 @@
             padding: 40px 20px;
         }
 
+        /* ปรับ Layout รองรับกล่องข้อความฝั่งขวา */
+        .main-layout {
+            display: flex;
+            width: 100%;
+            max-width: 1250px;
+            gap: 25px;
+            align-items: flex-start;
+        }
+
+        .left-content-area {
+            flex: 1;
+            max-width: 850px;
+            width: 100%;
+        }
+
         /* แถบประกาศข่าวสาร (Top Announcement) */
         .announcement-banner {
             width: 100%;
-            max-width: 850px;
+            max-width: 1250px;
             background-color: #feebc8;
             border-left: 5px solid #dd6b20;
             color: #744210;
@@ -44,7 +59,6 @@
         .container {
             background-color: #ffffff;
             width: 100%;
-            max-width: 850px;
             border-radius: 16px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
             overflow: hidden;
@@ -224,6 +238,18 @@
             width: 180px;
         }
         
+        .result-block-step {
+            background: rgba(255, 255, 255, 0.7);
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            font-size: 13px;
+            color: #2d3748;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
         .error-box {
             background-color: #ffebee;
             color: #c62828;
@@ -248,25 +274,6 @@
             padding-bottom: 6px;
         }
 
-        .info-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 15px;
-            font-size: 14px;
-        }
-
-        .info-table th, .info-table td {
-            border: 1px solid #e2e8f0;
-            padding: 10px 12px;
-            text-align: left;
-        }
-
-        .info-table th {
-            background-color: #f7fafc;
-            color: #2d3748;
-            font-weight: bold;
-        }
-
         .info-card-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -277,6 +284,8 @@
         @media (max-width: 600px) {
             .info-card-container { grid-template-columns: 1fr; }
             .color-standard-box { grid-template-columns: 1fr !important; }
+            .main-layout { flex-direction: column; }
+            .sidebar-right-area { width: 100% !important; position: static !important; }
         }
 
         .info-card {
@@ -323,32 +332,15 @@
             color: #4a5568;
             line-height: 1.6;
         }
-        .step-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .step-item {
-            background: #f7fafc;
-            border-left: 4px solid #2a5298;
-            padding: 10px 15px;
-            border-radius: 0 8px 8px 0;
-            font-size: 13.5px;
-            line-height: 1.5;
-        }
-        .step-item strong {
-            color: #1e3c72;
-        }
 
-        /* ระบบประวัติการทำงานส่วนหน้าบ้าน */
+        /* ระบบประวัติการทำงานย้ายมาฝั่งซ้าย */
         .history-container {
             background-color: #ffffff;
             width: 100%;
-            max-width: 850px;
             border-radius: 16px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
             padding: 25px;
+            margin-top: 20px;
         }
 
         .history-header {
@@ -465,7 +457,6 @@
         .btn-toggle-view { background-color: #3b82f6; }
         .btn-del { background-color: #ef4444; }
 
-        /* การ์ดแยกหมวดหมู่แอดมิน */
         .admin-grid-sections {
             display: grid;
             grid-template-columns: 1fr;
@@ -473,17 +464,62 @@
             margin-top: 15px;
         }
 
-        /* === ระบบแชท (Chat UI Component) === */
-        .chat-system-box {
-            background-color: #f7fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 15px;
-            margin-top: 25px;
+        /* === โซนขวา: ระบบแชท & สมาชิก === */
+        .sidebar-right-area {
+            width: 360px;
+            position: sticky;
+            top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
+
+        .chat-system-box {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .chat-auth-box {
+            background-color: #f7fafc;
+            border: 1px solid #edf2f7;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+        .chat-auth-box h4 {
+            font-size: 13px;
+            margin-bottom: 8px;
+            color: #4a5568;
+        }
+        .auth-input-group {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 5px;
+        }
+        .auth-input-group input {
+            flex: 1;
+            padding: 6px 10px;
+            font-size: 12px;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+        }
+        .btn-auth {
+            background-color: #3182ce;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            font-size: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
         .chat-logs {
-            height: 180px;
-            background: white;
+            height: 280px;
+            background: #f8fafc;
             border: 1px solid #cbd5e0;
             border-radius: 8px;
             padding: 10px;
@@ -495,18 +531,25 @@
             font-size: 13px;
         }
         .chat-msg {
-            padding: 6px 10px;
-            border-radius: 6px;
-            max-width: 80%;
+            padding: 8px 12px;
+            border-radius: 12px;
+            max-width: 85%;
             line-height: 1.4;
         }
-        .chat-msg.user { background-color: #e2e8f0; align-self: flex-start; }
-        .chat-msg.admin { background-color: #d6bcfa; color: #44337a; align-self: flex-end; font-weight: 500; }
+        .chat-msg.user { background-color: #e2e8f0; align-self: flex-start; border-top-left-radius: 2px; }
+        .chat-msg.admin { background-color: #d6bcfa; color: #44337a; align-self: flex-end; font-weight: 500; border-top-right-radius: 2px; }
         
-        /* สไตล์ชุดแถบปุ่มเลือกอิโมจิ */
+        .chat-user-status-lbl {
+            font-size: 12px; 
+            font-weight: bold; 
+            color: #4a5568; 
+            margin-bottom: 8px; 
+            display: none;
+        }
+
         .chat-emoji-container {
             display: flex;
-            gap: 5px;
+            gap: 4px;
             margin-bottom: 8px;
             padding: 4px;
             background-color: #edf2f7;
@@ -516,10 +559,10 @@
         .emoji-btn {
             background: white;
             border: 1px solid #cbd5e0;
-            padding: 4px 8px;
+            padding: 3px 6px;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
             transition: transform 0.1s;
         }
         .emoji-btn:hover {
@@ -529,7 +572,7 @@
 
         .chat-input-flex {
             display: flex;
-            gap: 8px;
+            gap: 6px;
         }
     </style>
 </head>
@@ -540,207 +583,183 @@
     <button onclick="this.parentElement.style.display='none'" style="background:none; border:none; cursor:pointer; font-weight:bold; color:#744210;">✕</button>
 </div>
 
-<div class="container">
-    <div class="header">
-        <h1>🌐 IP Network & Cable Infrastructure</h1>
-        <p>เครื่องมือวิเคราะห์เครือข่ายระดับลึก และศูนย์ข้อมูลประเภทสายสัญญาณ</p>
-        <button class="admin-badge-btn" id="adminStatusBtn" onclick="toggleAdminAccess()">🔒 ตรวจสอบสิทธิ์แอดมิน</button>
-    </div>
-
-    <div class="tabs">
-        <button class="tab-btn active" id="btn-tab-ipv4" onclick="switchTab('ipv4-tab', this)">IPv4 Calculator</button>
-        <button class="tab-btn" id="btn-tab-ipv6" onclick="switchTab('ipv6-tab', this)">IPv6 Expanded</button>
-        <button class="tab-btn" id="btn-tab-cable" onclick="switchTab('cable-tab', this)">🔌 สายเน็ต & หัวต่อ</button>
-        <button class="tab-btn" id="btn-tab-admin" onclick="switchTab('admin-tab', this)" style="color:#8b5cf6; display:none;">⚙️ ระบบแอดมิน (CMS)</button>
-    </div>
-
-    <div class="content">
-        
-        <div id="ipv4-tab" class="tab-content active">
-            <div class="input-group">
-                <label for="ipv4-input">กรอกข้อมูล IPv4 ที่ต้องการคำนวณ</label>
-                <input type="text" id="ipv4-input" placeholder="เช่น 192.168.1.1, 192.168.1.0/24 หรือ เลขฐานสอง">
-                <div class="help-text">รองรับ 3 รูปแบบ: เลขฐานสองสี่กลุ่ม, CIDR สแลชพรีฟิก (เช่น /24), หรือ IP ปกติเพื่อแปลงเป็นฐานสอง</div>
-            </div>
-            <button class="btn-calc" onclick="calculateIPv4()">วิเคราะห์และคำนวณ</button>
-            <div id="ipv4-error" class="error-box"></div>
-            <div id="ipv4-result" class="result-box"></div>
-        </div>
-
-        <div id="ipv6-tab" class="tab-content">
-            <div class="input-group">
-                <label for="ipv6-input">กรอกเลข IPv6 (แบบย่อหรือเต็ม)</label>
-                <input type="text" id="ipv6-input" placeholder="เช่น 2001:db8::ff00:42:8329">
-                <div class="help-text">ระบบจะทำการขยายเลขที่ย่อด้วย "::" ออกมาเป็นเลขโครงสร้างแบบเต็ม 8 กลุ่มย่อยอัตโนมัติ</div>
-            </div>
-            <button class="btn-calc" onclick="calculateIPv6()">ขยายรูปแบบ IPv6</button>
-            <div id="ipv6-error" class="error-box"></div>
-            <div id="ipv6-result" class="result-box"></div>
-        </div>
-
-        <div id="cable-tab" class="tab-content">
-            <div class="info-section">
-                <h3>📊 ประเภทของสายแลน (UTP Cable Categories)</h3>
-                <p style="font-size: 14px; color: #4a5568; margin-bottom: 12px; line-height: 1.5;">สาย UTP หรือสายแลน แบ่งตามประสิทธิภาพการรับส่งข้อมูลและแบนด์วิดท์หลักในระบบ:</p>
-                <table class="info-table">
-                    <thead>
-                        <tr>
-                            <th>ประเภทสาย</th>
-                            <th>ความเร็วสูงสุด (Max Speed)</th>
-                            <th>แบนด์วิดท์ (Bandwidth)</th>
-                            <th>ระยะทางสูงสุด</th>
-                        </tr>
-                    </thead>
-                    <tbody id="webCableTableBody"></tbody>
-                </table>
+<div class="main-layout">
+    
+    <div class="left-content-area">
+        <div class="container">
+            <div class="header">
+                <h1>🌐 IP Network & Content Infrastructure</h1>
+                <p>เครื่องมือวิเคราะห์เครือข่ายระดับลึก และศูนย์จัดการคลังข้อมูลอิสระ</p>
+                <button class="admin-badge-btn" id="adminStatusBtn" onclick="toggleAdminAccess()">🔒 ตรวจสอบสิทธิ์แอดมิน</button>
             </div>
 
-            <div class="info-section">
-                <h3>🔌 ประเภทของหัวสายเน็ตและตัวต่อ (Network Connectors)</h3>
-                <div class="info-card-container">
-                    <div class="info-card">
-                        <h4>🔹 หัว RJ-45 (Registered Jack 45)</h4>
-                        <p>เป็นหัวต่อมาตรฐานที่ใช้กับสายแลน (UTP) มีพินโลหะภายในทั้งหมด 8 พิน รองรับการเข้าสายแบบมาตรฐาน T568A และ T568B ใช้เชื่อมต่อคอมพิวเตอร์และสวิตช์หลัก มีทั้งรุ่นปกติและรุ่นพิเศษแบบทะลุเพื่อให้เข้าสายได้ง่ายขึ้น</p>
-                    </div>
-                    <div class="info-card">
-                        <h4>🔹 หัว RJ-11 (Registered Jack 11)</h4>
-                        <p>หัวต่อขนาดเล็กกว่า RJ-45 มีพินเชื่อมต่อภายใน 4 หรือ 6 พิน นิยมใช้สำหรับสายโทรศัพท์บ้านพื้นฐาน และต่อเข้าช่อง ADSL/VDSL ของโมเด็มรุ่นเก่า</p>
-                    </div>
-                </div>
-                <div class="info-card-container" style="grid-template-columns: 1fr;">
-                    <div class="info-card">
-                        <h4>🔹 หัว Fiber SC / LC Connector</h4>
-                        <p>หัวต่อสำหรับสายใยแก้วนำแสง (Fiber Optic) โดยหัว SC มีลักษณะสี่เหลี่ยมใช้ระบบผลักเข้าดึงออก และหัว LC มีขนาดเล็กกว่าครึ่งหนึ่ง นิยมใช้ในอุปกรณ์แบนด์วิดท์สูงระดับโมเดิร์นองค์กร</p>
-                    </div>
-                </div>
+            <div class="tabs">
+                <button class="tab-btn active" id="btn-tab-ipv4" onclick="switchTab('ipv4-tab', this)">IPv4 Calculator</button>
+                <button class="tab-btn" id="btn-tab-ipv6" onclick="switchTab('ipv6-tab', this)">IPv6 Expanded</button>
+                <button class="tab-btn" id="btn-tab-cable" onclick="switchTab('cable-tab', this)">🔌 คลังข้อมูลระบบ</button>
+                <button class="tab-btn" id="btn-tab-admin" onclick="switchTab('admin-tab', this)" style="color:#8b5cf6; display:none;">⚙️ ระบบแอดมิน (CMS)</button>
             </div>
 
-            <div class="info-section">
-                <h3>🎨 มาตรฐานการเรียงสีสายแลน (EIA/TIA-568)</h3>
-                <p style="font-size: 14px; color: #4a5568; line-height: 1.5;">การเข้าหัว RJ-45 มีลำดับพิน 1-8 โดยหันด้านหน้าสัมผัสทองแดงเข้าหาตัวและหันสลักล็อกไปด้านหลัง ดังนี้:</p>
-                <div class="color-standard-box">
-                    <div class="color-card">
-                        <h5 style="color:#2b6cb0;">🟢 มาตรฐาน T568A</h5>
-                        <ol class="color-list-ol">
-                            <li>ขาว-เขียว</li><li>เขียว</li><li>ขาว-ส้ม</li><li>น้ำเงิน</li>
-                            <li>ขาว-น้ำเงิน</li><li>ส้ม</li><li>ขาว-น้ำตาล</li><li>น้ำตาล</li>
-                        </ol>
-                    </div>
-                    <div class="color-card">
-                        <h5 style="color:#dd6b20;">🟠 มาตรฐาน T568B (นิยมมากที่สุด)</h5>
-                        <ol class="color-list-ol">
-                            <li>ขาว-ส้ม</li><li>ส้ม</li><li>ขาว-เขียว</li><li>น้ำเงิน</li>
-                            <li>ขาว-น้ำเงิน</li><li>เขียว</li><li>ขาว-น้ำตาล</li><li>น้ำตาล</li>
-                        </ol>
-                    </div>
-                </div>
-            </div>
-
-            <div class="info-section">
-                <h3>📐 รูปแบบโครงสร้างสาย LAN ในระบบเครือข่าย</h3>
-                <div class="info-card-container">
-                    <div class="info-card">
-                        <h4>🔗 สายตรง (Straight Through Cable)</h4>
-                        <p><strong>การเข้าสาย:</strong> ปลายทั้งสองด้านใช้มาตรฐานเดียวกัน (เช่น T568B ↔ T568B)<br>
-                        <strong>การใช้งาน:</strong> เชื่อมต่ออุปกรณ์ต่างชนิดกัน เช่น PC ↔ Switch/Hub, Router ↔ Switch/Hub</p>
-                    </div>
-                    <div class="info-card">
-                        <h4>🔄 สายไขว้ (Crossover Cable)</h4>
-                        <p><strong>การเข้าสาย:</strong> ปลายด้านหนึ่งเป็น T568A ส่วนปลายอีกด้านเป็น T568B<br>
-                        <strong>การใช้งาน:</strong> เชื่อมต่ออุปกรณ์ชนิดเดียวกันโดยตรง เช่น PC ↔ PC, Switch ↔ Switch, Hub ↔ Hub (สำหรับอุปกรณ์รุ่นเก่าที่ไม่รองรับ Auto MDI-X)</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="info-section">
-                <h3>🛠️ 8 ขั้นตอนการเข้าหัวสาย RJ-45 (Straight Through แบบ T568B)</h3>
-                <div class="step-list">
-                    <div class="step-item"><strong>1. ตัดสาย:</strong> ตัดสาย LAN ให้ได้ความยาวและเรียบตรงตามความต้องการ</div>
-                    <div class="step-item"><strong>2. ปอกสาย:</strong> ใช้คีมปอกสาย ปอกฉนวนหุ้มภายนอกออกประมาณ 2-3 เซนติเมตร</div>
-                    <div class="step-item"><strong>3. แยกสาย:</strong> คลายเกลียวคู่สายที่พันกันอยู่ออกแยกเป็นเส้นเดี่ยว แล้วคลึงออกให้ตรง</div>
-                    <div class="step-item"><strong>4. เรียงสี (T568B):</strong> จัดเรียงลำดับสีตามมาตรฐาน ขาวส้ม, ส้ม, ขาวเขียว, น้ำเงิน, ขาวน้ำเงิน, เขียว, ขาวน้ำตาล, น้ำตาล</div>
-                    <div class="step-item"><strong>5. ตัดปลายสาย:</strong> จับสายให้ชิดกันแล้วใช้คีมตัดปลายสายให้ตรงและเรียบเสมอกัน เพื่อให้เข้าหน้าสัมผัสพร้อมกัน</div>
-                    <div class="step-item"><strong>6. ใส่หัว RJ-45:</strong> สอดปลายสายแลนเข้าไปในหัว RJ-45 ให้สุดปลายจนชนแถบทองแดงด้านหน้าสุด</div>
-                    <div class="step-item"><strong>7. ย้ำหัว:</strong> นำหัว RJ-45 ใส่ในช่องคีมย้ำสายแลน แล้วออกแรงกดบีบคีมย้ำให้พินทองแดงล็อกกับสายให้แน่นสนิท</div>
-                    <div class="step-item"><strong>8. ทดสอบสาย:</strong> นำสายทั้งสองฝั่งเสียบเข้าเครื่องทดสอบสัญญาณ (LAN Tester) ไฟสถานะต้องขึ้นเรียงกันครบตั้งแต่เลข 1-8</div>
-                </div>
-            </div>
-        </div>
-
-        <div id="admin-tab" class="tab-content">
-            <h2 style="color:#6d28d9; margin-bottom: 15px;">🛠️ ศูนย์ควบคุมระบบแอดมินระดับสูง (Advanced CMS)</h2>
-            
-            <div class="admin-panel-box">
-                <h3 style="color:#8b5cf6; margin-bottom:10px;">📦 หมวดหมู่: จัดการข้อมูลสายสัญญาณหน้าเว็บ</h3>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                    <input type="text" id="admCatName" placeholder="ประเภทสาย (เช่น Cat 7)" style="padding:10px; margin-bottom:8px; border:1px solid #cbd5e0; border-radius:6px;">
-                    <input type="text" id="admCatSpeed" placeholder="ความเร็ว (เช่น 10 Gbps)" style="padding:10px; margin-bottom:8px; border:1px solid #cbd5e0; border-radius:6px;">
-                    <input type="text" id="admCatBandwidth" placeholder="แบนด์วิดท์ (เช่น 600 MHz)" style="padding:10px; margin-bottom:8px; border:1px solid #cbd5e0; border-radius:6px;">
-                    <input type="text" id="admCatDistance" placeholder="ระยะทาง (เช่น 100 เมตร)" style="padding:10px; margin-bottom:8px; border:1px solid #cbd5e0; border-radius:6px;">
-                </div>
-                <button class="btn-calc" style="background-color:#8b5cf6; margin-top:5px; padding:10px;" onclick="addNewCableContent()">💾 บันทึกและเพิ่มข้อมูลสายแลน</button>
+            <div class="content">
                 
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>ประเภทสาย</th>
-                            <th>ความเร็ว</th>
-                            <th>สถานะ</th>
-                            <th>การจัดการ</th>
-                        </tr>
-                    </thead>
-                    <tbody id="adminCableControlBody"></tbody>
-                </table>
-            </div>
-
-            <div class="admin-grid-sections">
-                <div class="admin-panel-box" style="background-color: #fffaf0; border-color: #dd6b20;">
-                    <h3 style="color:#dd6b20; margin-bottom:10px;">👥 หมวดหมู่: ตรวจสอบผู้ใช้ปัจจุบัน & แบน IP</h3>
-                    <p style="font-size:12px; color:#718096; margin-bottom:8px;">รายชื่อ Client ที่กำลังเปิดดูหน้าเว็บของคุณขณะนี้</p>
-                    <table class="admin-table" style="margin-top:5px;">
-                        <thead>
-                            <tr style="background-color:#dd6b20;">
-                                <th>จำลอง IP ผู้ใช้</th>
-                                <th>อุปกรณ์/เบราว์เซอร์</th>
-                                <th>การจัดการ</th>
-                            </tr>
-                        </thead>
-                        <tbody id="adminUsersTableBody"></tbody>
-                    </table>
-                </div>
-
-                <div class="admin-panel-box" style="background-color: #f7fafc; border-color: #4a5568;">
-                    <h3 style="color:#4a5568; margin-bottom:10px;">📋 หมวดหมู่: ล็อกประวัติการเข้าใช้งาน (Access Logs)</h3>
-                    <div id="adminAccessLogs" style="max-height:150px; overflow-y:auto; font-family:monospace; font-size:11px; background:white; padding:8px; border:1px solid #cbd5e0; border-radius:6px;">
+                <div id="ipv4-tab" class="tab-content active">
+                    <div class="input-group">
+                        <label for="ipv4-input">กรอกข้อมูล IPv4 ที่ต้องการคำนวณ</label>
+                        <input type="text" id="ipv4-input" placeholder="เช่น 192.168.1.1, 194.17.10.0/27 หรือ เลขฐานสอง">
+                        <div class="help-text">รองรับ 3 รูปแบบ: เลขฐานสองสี่กลุ่ม, CIDR สแลชพรีฟิก (เช่น /24), หรือ IP ปกติเพื่อแปลงเป็นฐานสอง</div>
                     </div>
+                    <button class="btn-calc" onclick="calculateIPv4()">วิเคราะห์และคำนวณ</button>
+                    <div id="ipv4-error" class="error-box"></div>
+                    <div id="ipv4-result" class="result-box"></div>
                 </div>
 
-                <div class="admin-panel-box" style="background-color: #f0fff4; border-color: #38a169;">
-                    <h3 style="color:#38a169; margin-bottom:10px;">📢 หมวดหมู่: ส่งอีเมลข่าวสาร & ปล่อยประกาศระบบ</h3>
-                    
-                    <div style="margin-bottom:15px; background:white; padding:10px; border-radius:6px; border:1px solid #c6f6d5;">
-                        <label style="font-size:13px; font-weight:bold;">📍 ปล่อยประกาศขึ้นแถบบนสุดของเว็บ:</label>
-                        <div style="display:flex; gap:8px; margin-top:5px;">
-                            <input type="text" id="admAnnounceInput" placeholder="พิมพ์ข้อความที่ต้องการประกาศ..." style="flex:1; padding:8px; border:1px solid #cbd5e0; border-radius:4px; font-size:13px;">
-                            <button onclick="publishAnnouncement()" style="background-color:#38a169; color:white; border:none; padding:8px 12px; border-radius:4px; cursor:pointer; font-size:13px; font-weight:bold;">ประกาศ</button>
+                <div id="ipv6-tab" class="tab-content">
+                    <div class="input-group">
+                        <label for="ipv6-input">กรอกเลข IPv6 (แบบย่อหรือเต็ม)</label>
+                        <input type="text" id="ipv6-input" placeholder="เช่น 2001:db8::ff00:42:8329">
+                        <div class="help-text">ระบบจะทำการขยายเลขที่ย่อด้วย "::" ออกมาเป็นเลขโครงสร้างแบบเต็ม 8 กลุ่มย่อยอัตโนมัติ</div>
+                    </div>
+                    <button class="btn-calc" onclick="calculateIPv6()">ขยายรูปแบบ IPv6</button>
+                    <div id="ipv6-error" class="error-box"></div>
+                    <div id="ipv6-result" class="result-box"></div>
+                </div>
+
+                <div id="cable-tab" class="tab-content">
+                    <div class="info-section">
+                        <h3>📊 รายการคลังข้อมูลและองค์ความรู้ระบบอินเทอร์เน็ต</h3>
+                        <p style="font-size: 14px; color: #4a5568; margin-bottom: 15px; line-height: 1.5;">รวบรวมข้อมูล ข่าวสาร และองค์ความรู้ที่อัปเดตล่าสุดจากทางผู้ดูแลระบบโดยตรง:</p>
+                        <div id="dynamicKnowledgeContainer" style="display: flex; flex-direction: column; gap: 20px;"></div>
+                    </div>
+
+                    <div class="info-section">
+                        <h3>🔌 ประเภทของหัวสายเน็ตและตัวต่อ (Network Connectors)</h3>
+                        <div class="info-card-container">
+                            <div class="info-card">
+                                <h4>🔹 หัว RJ-45 (Registered Jack 45)</h4>
+                                <p>เป็นหัวต่อมาตรฐานที่ใช้กับสายแลน (UTP) มีพินโลหะภายในทั้งหมด 8 พิน รองรับการเข้าสายแบบมาตรฐาน T568A และ T568B ใช้เชื่อมต่อคอมพิวเตอร์และสวิตช์หลัก มีทั้งรุ่นปกติและรุ่นพิเศษแบบทะลุเพื่อให้เข้าสายได้ง่ายขึ้น</p>
+                            </div>
+                            <div class="info-card">
+                                <h4>🔹 หัว RJ-11 (Registered Jack 11)</h4>
+                                <p>หัวต่อขนาดเล็กกว่า RJ-45 มีพินเชื่อมต่อภายใน 4 หรือ 6 พิน นิยมใช้สำหรับสายโทรศัพท์บ้านพื้นฐาน และต่อเข้าช่อง ADSL/VDSL ของโมเด็มรุ่นเก่า</p>
+                            </div>
                         </div>
                     </div>
 
-                    <div style="background:white; padding:10px; border-radius:6px; border:1px solid #c6f6d5;">
-                        <label style="font-size:13px; font-weight:bold;">✉️ แบบฟอร์มส่งอีเมลแจ้งผู้ใช้ (Email Marketing):</label>
-                        <input type="email" id="admEmailTarget" placeholder="ระบุอีเมลปลายทาง (เช่น client@domain.com)" style="width:100%; padding:8px; margin-top:5px; border:1px solid #cbd5e0; border-radius:4px; font-size:13px;">
-                        <textarea id="admEmailContent" placeholder="พิมพ์เนื้อหาอีเมลข่าวสาร..." rows="2" style="width:100%; padding:8px; margin-top:5px; border:1px solid #cbd5e0; border-radius:4px; font-size:13px; resize:none;"></textarea>
-                        <button onclick="dispatchAdminEmail()" style="background-color:#2f855a; color:white; border:none; padding:8px 12px; border-radius:4px; cursor:pointer; font-size:13px; font-weight:bold; width:100%; margin-top:5px;">🚀 ส่งจดหมายข่าวอีเมล</button>
+                    <div class="info-section">
+                        <h3>🎨 มาตรฐานการเรียงสีสายแลน (EIA/TIA-568)</h3>
+                        <div class="color-standard-box">
+                            <div class="color-card">
+                                <h5 style="color:#2b6cb0;">🟢 มาตรฐาน T568A</h5>
+                                <ol class="color-list-ol">
+                                    <li>ขาว-เขียว</li><li>เขียว</li><li>ขาว-ส้ม</li><li>น้ำเงิน</li>
+                                    <li>ขาว-น้ำเงิน</li><li>ส้ม</li><li>ขาว-น้ำตาล</li><li>น้ำตาล</li>
+                                </ol>
+                            </div>
+                            <div class="color-card">
+                                <h5 style="color:#dd6b20;">🟠 มาตรฐาน T568B (นิยมมากที่สุด)</h5>
+                                <ol class="color-list-ol">
+                                    <li>ขาว-ส้ม</li><li>ส้ม</li><li>ขาว-เขียว</li><li>น้ำเงิน</li>
+                                    <li>ขาว-น้ำเงิน</li><li>เขียว</li><li>ขาว-น้ำตาล</li><li>น้ำตาล</li>
+                                </ol>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
+                <div id="admin-tab" class="tab-content">
+                    <h2 style="color:#6d28d9; margin-bottom: 15px;">🛠️ ศูนย์ควบคุมระบบแอดมินระดับสูง (Advanced CMS)</h2>
+                    
+                    <div class="admin-panel-box">
+                        <h3 style="color:#8b5cf6; margin-bottom:10px;">📦 หมวดหมู่: อัปเดตและเขียนข้อมูลลงคลังความรู้หน้าเว็บ</h3>
+                        <div style="display:flex; flex-direction:column; gap:10px;">
+                            <input type="text" id="admDocTitle" placeholder="หัวข้อหลัก / ชื่อบทความเรื่องที่ต้องการเขียน..." style="padding:10px; border:1px solid #cbd5e0; border-radius:6px;">
+                            <textarea id="admDocContent" placeholder="เนื้อหารายละเอียดด้านใน... สามารถเขียนอธิบายข้อมูลต่าง ๆ เข้าไปได้ยาว ๆ แบบอิสระเสรี" rows="4" style="padding:10px; border:1px solid #cbd5e0; border-radius:6px; resize:vertical; font-size:14px;"></textarea>
+                        </div>
+                        <button class="btn-calc" style="background-color:#8b5cf6; margin-top:10px; padding:10px;" onclick="saveDynamicContent()">💾 บันทึกและส่งข้อมูลขึ้นคลังความรู้</button>
+                        
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>หัวข้อข้อมูล</th>
+                                    <th>Subnet / สถานะ</th>
+                                    <th>การจัดการคลัง</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminKnowledgeControlBody"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="admin-grid-sections">
+                        <div class="admin-panel-box" style="background-color: #fffaf0; border-color: #dd6b20;">
+                            <h3 style="color:#dd6b20; margin-bottom:10px;">👥 หมวดหมู่: ตรวจสอบผู้ใช้ปัจจุบัน & แบน IP</h3>
+                            <table class="admin-table" style="margin-top:5px;">
+                                <thead>
+                                    <tr style="background-color:#dd6b20;">
+                                        <th>จำลอง IP ผู้ใช้</th>
+                                        <th>อุปกรณ์/เบราว์เซอร์</th>
+                                        <th>การจัดการ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminUsersTableBody"></tbody>
+                            </table>
+                        </div>
+
+                        <div class="admin-panel-box" style="background-color: #f7fafc; border-color: #4a5568;">
+                            <h3 style="color:#4a5568; margin-bottom:10px;">📋 หมวดหมู่: ล็อกประวัติการเข้าใช้งาน (Access Logs)</h3>
+                            <div id="adminAccessLogs" style="max-height:150px; overflow-y:auto; font-family:monospace; font-size:11px; background:white; padding:8px; border:1px solid #cbd5e0; border-radius:6px;"></div>
+                        </div>
+
+                        <div class="admin-panel-box" style="background-color: #f0fff4; border-color: #38a169;">
+                            <h3 style="color:#38a169; margin-bottom:10px;">📢 หมวดหมู่: ส่งอีเมลข่าวสาร & ปล่อยประกาศระบบ</h3>
+                            <div style="margin-bottom:15px; background:white; padding:10px; border-radius:6px; border:1px solid #c6f6d5;">
+                                <label style="font-size:13px; font-weight:bold;">📍 ปล่อยประกาศขึ้นแถบบนสุดของเว็บ:</label>
+                                <div style="display:flex; gap:8px; margin-top:5px;">
+                                    <input type="text" id="admAnnounceInput" placeholder="พิมพ์ข้อความที่ต้องการประกาศ..." style="flex:1; padding:8px; border:1px solid #cbd5e0; border-radius:4px; font-size:13px;">
+                                    <button onclick="publishAnnouncement()" style="background-color:#38a169; color:white; border:none; padding:8px 12px; border-radius:4px; cursor:pointer; font-size:13px; font-weight:bold;">ประกาศ</button>
+                                </div>
+                            </div>
+                            <div style="background:white; padding:10px; border-radius:6px; border:1px solid #c6f6d5;">
+                                <label style="font-size:13px; font-weight:bold;">✉️ แบบฟอร์มส่งอีเมลแจ้งผู้ใช้ (Email Marketing):</label>
+                                <input type="email" id="admEmailTarget" placeholder="ระบุอีเมลปลายทาง..." style="width:100%; padding:8px; margin-top:5px; border:1px solid #cbd5e0; border-radius:4px; font-size:13px;">
+                                <textarea id="admEmailContent" placeholder="พิมพ์เนื้อหาอีเมลข่าวสาร..." rows="2" style="width:100%; padding:8px; margin-top:5px; border:1px solid #cbd5e0; border-radius:4px; font-size:13px; resize:none;"></textarea>
+                                <button onclick="dispatchAdminEmail()" style="background-color:#2f855a; color:white; border:none; padding:8px 12px; border-radius:4px; cursor:pointer; font-size:13px; font-weight:bold; width:100%; margin-top:5px;">🚀 ส่งจดหมายข่าวอีเมล</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
         </div>
 
+        <div class="history-container">
+            <div class="history-header">
+                <h2>🕒 ประวัติและล็อกการคำนวณทั้งหมดในระบบ</h2>
+                <button class="btn-clear-history" onclick="clearHistory()">ล้างประวัติทั้งหมด</button>
+            </div>
+            <div id="history-list" class="history-list">
+                <div class="no-history">ยังไม่มีประวัติการคำนวณในเซสชันนี้</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="sidebar-right-area">
         <div class="chat-system-box">
-            <h3 style="font-size:15px; color:#2d3748; margin-bottom:8px; display:flex; align-items:center; gap:6px;">💬 ระบบแชทสดสอบถามข้อมูล (Live Chat Matrix)</h3>
+            <h3 style="font-size:15px; color:#2d3748; margin-bottom:12px; display:flex; align-items:center; gap:6px;">💬 ระบบแชทสด (Live Chat Matrix)</h3>
+            
+            <div id="chatAuthSection" class="chat-auth-box">
+                <h4>🔐 กรุณาลงทะเบียน/เข้าสู่ระบบก่อนร่วมสนทนา</h4>
+                <div class="auth-input-group">
+                    <input type="text" id="chatRegUsername" placeholder="ตั้งชื่อผู้ใช้งาน...">
+                    <button class="btn-auth" onclick="registerChatUser()">เข้าใช้แชท</button>
+                </div>
+            </div>
+            
+            <div id="chatUserStatusLabel" class="chat-user-status-lbl">
+                สถานะ: 👤 กำลังเข้าใช้งานด้วยชื่อ <span id="currentChatUserText" style="color:#2b6cb0;">-</span>
+            </div>
+
             <div class="chat-logs" id="chatLogsArea">
-                <div class="chat-msg user"><strong>ระบบบอต:</strong> ยินดีต้อนรับเข้าสู่ศูนย์เครือข่าย พิมพ์ส่งข้อความแชทคุยทดสอบได้เลยค่ะ!</div>
+                <div class="chat-msg user"><strong>ระบบบอต:</strong> ยินดีต้อนรับค่ะ! โปรดทำการสมัครหรือลงทะเบียนทางด้านบนก่อนพิมพ์ข้อความคุยกับเรานะคะ 😊</div>
             </div>
             
             <div class="chat-emoji-container">
@@ -750,505 +769,533 @@
                 <button class="emoji-btn" onclick="appendEmojiToInput('🚀')">🚀</button>
                 <button class="emoji-btn" onclick="appendEmojiToInput('🔑')">🔑</button>
                 <button class="emoji-btn" onclick="appendEmojiToInput('💬')">💬</button>
-                <button class="emoji-btn" onclick="appendEmojiToInput('🛠️')">🛠️</button>
                 <button class="emoji-btn" onclick="appendEmojiToInput('👍')">👍</button>
-                <button class="emoji-btn" onclick="appendEmojiToInput('😄')">😄</button>
                 <button class="emoji-btn" onclick="appendEmojiToInput('⚠️')">⚠️</button>
             </div>
 
             <div class="chat-input-flex">
-                <select id="chatSenderRole" style="padding:8px; border:1px solid #cbd5e0; border-radius:6px; font-size:13px;">
-                    <option value="ผู้ใช้ทั่วไป">👤 ผู้ใช้ทั่วไป</option>
-                    <option value="แอดมินระบบ" id="chatRoleAdminOpt" disabled>🔑 แอดมินระบบ</option>
-                </select>
-                <input type="text" id="chatMessageInput" placeholder="พิมพ์ข้อความสนทนาที่นี่..." style="flex:1; padding:8px; border:1px solid #cbd5e0; border-radius:6px; font-size:13px;" onkeypress="if(event.key==='Enter') sendChatMessage()">
-                <button onclick="sendChatMessage()" style="background-color:#4a5568; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:13px;">ส่งแชท</button>
+                <input type="text" id="chatMessageInput" placeholder="ต้องลงทะเบียนเข้าสู่ระบบก่อนพิมพ์..." disabled style="flex:1; padding:8px; border:1px solid #cbd5e0; border-radius:6px; font-size:13px;" onkeypress="if(event.key==='Enter') sendChatMessage()">
+                <button id="chatSendBtn" onclick="sendChatMessage()" disabled style="background-color:#4a5568; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:13px;">ส่ง</button>
             </div>
         </div>
+    </div>
 
-    </div>
-</div>
-
-<div class="history-container">
-    <div class="history-header">
-        <h2>🕒 ประวัติและล็อกการคำนวณทั้งหมดในระบบ</h2>
-        <button class="btn-clear-history" onclick="clearHistory()">ล้างประวัติทั้งหมด</button>
-    </div>
-    <div id="history-list" class="history-list">
-        <div class="no-history">ยังไม่มีประวัติการคำนวณในเซสชันนี้</div>
-    </div>
 </div>
 
 <script>
-    // ฐานข้อมูลสายแลนตั้งต้น
-    let cableDatabase = [
-        { id: 1, name: "Cat 5e", speed: "1 Gbps", bandwidth: "100 MHz", distance: "100 เมตร", isVisible: true },
-        { id: 2, name: "Cat 6", speed: "10 Gbps (ที่ &le;55ม.)", bandwidth: "250 MHz", distance: "100 เมตร", isVisible: true },
-        { id: 3, name: "Cat 6A", speed: "10 Gbps", bandwidth: "500 MHz", distance: "100 เมตร", isVisible: true },
-        { id: 4, name: "Cat 8", speed: "25 Gbps - 40 Gbps", bandwidth: "2000 MHz", distance: "30 เมตร", isVisible: true }
+    let knowledgeDatabase = [
+        { id: 1, title: "คู่มือสายแลน Cat 5e เบื้องต้น", content: "สายประเภทนี้รองรับความเร็วสูงสุดที่ 1 Gbps มีแบนด์วิดท์อยู่ที่ 100 MHz เหมาะสำหรับระบบเน็ตเวิร์กภายในบ้านทั่วไปที่ระยะทางไม่เกิน 100 เมตร", isVisible: true },
+        { id: 2, title: "ทำความเข้าใจสาย Cat 6 และข้อจำกัดความเร็ว", content: "สาย Cat 6 รองรับความเร็วสูงสุด 10 Gbps หากใช้งานในระยะทางสั้นไม่เกิน 55 เมตร แต่ถ้าเดินสายยาวเต็มระยะ 100 เมตร ความเร็วจะตกลงมาอยู่ที่ระดับความเร็วสูงสุดประมาณ 1 Gbps โดยทำงานบน Bandwidth 250 MHz", isVisible: true }
     ];
 
-    // ข้อมูลรายชื่อผู้เข้าชมเว็บ
     let activeUsersDatabase = [
         { ip: "192.168.1.45", agent: "Chrome / Windows 11" },
         { ip: "172.20.10.3", agent: "Safari / iPhone iOS 17" },
-        { ip: "10.0.0.122", agent: "Firefox / MacOS" }
+        { ip: "10.0.0.122", agent: "Firefox / MacOS Sequoia" }
     ];
 
     let cachedHistoryRecords = [];
     let isAdminAuthenticated = false;
+    let registeredChatSessionName = ""; 
 
     window.onload = function() {
-        renderCableContentData();
+        renderKnowledgeContentData();
         renderActiveUsersData();
-        logAccessAction("127.0.0.1", "เข้าสู่หน้าเว็บหลัก (Online App Initialized)");
+        logAccessAction("127.0.0.1", "เข้าสู่หน้าเว็บ (เดสก์ท็อป)");
     };
 
-    // ฟังก์ชันนำอิโมจิไปต่อท้ายข้อความใน Input แชท
+    // ฟังก์ชันดึง Class ของ IP ตามเงื่อนไขที่คุณระบุมาครบทุก Class
+    const getIpClass = (firstOctet) => {
+        if (firstOctet >= 1 && firstOctet <= 126) return "Class A";
+        if (firstOctet === 127) return "Class A (Loopback)";
+        if (firstOctet >= 128 && firstOctet <= 191) return "Class B";
+        if (firstOctet >= 192 && firstOctet <= 223) return "Class C";
+        if (firstOctet >= 224 && firstOctet <= 239) return "Class D (Multicast)";
+        if (firstOctet >= 240 && firstOctet <= 255) return "Class E (Experimental)";
+        return "Other";
+    };
+
+    function registerChatUser() {
+        const username = document.getElementById('chatRegUsername').value.trim();
+        if(!username) { alert("กรุณากรอกชื่อผู้ใช้งานก่อนค่ะ"); return; }
+        
+        registeredChatSessionName = username;
+        document.getElementById('chatAuthSection').style.display = "none";
+        document.getElementById('chatUserStatusLabel').style.display = "block";
+        document.getElementById('currentChatUserText').innerText = username;
+        
+        document.getElementById('chatMessageInput').disabled = false;
+        document.getElementById('chatMessageInput').placeholder = "พิมพ์ข้อความสนทนาที่นี่...";
+        document.getElementById('chatSendBtn').disabled = false;
+        
+        alert(`🎉 ยินดีต้อนรับคุณ ${username} เข้าสู่ระบบสำเร็จ!`);
+        logAccessAction("CLIENT", `ผู้ใช้ทำการลงทะเบียนแชทชื่อ: ${username}`);
+    }
+
     function appendEmojiToInput(emoji) {
         const input = document.getElementById('chatMessageInput');
+        if(input.disabled) return;
         input.value += emoji;
         input.focus();
     }
 
-    // ฟังก์ชันสลับแท็บเมนู
-    function switchTab(tabId, el) {
-        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-        el.classList.add('active');
+    function logAccessAction(ip, activity) {
+        const container = document.getElementById('adminAccessLogs');
+        if (!container) return;
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('th-TH');
+        container.innerHTML += `[${timeStr}] IP: ${ip} -> ทำกิจกรรม: ${activity}<br>`;
+        container.scrollTop = container.scrollHeight;
     }
 
-    // ฟังก์ชันสลับสิทธิ์แอดมิน (จำลองระบบล็อกอินอย่างง่าย)
-    function toggleAdminAccess() {
-        isAdminAuthenticated = !isAdminAuthenticated;
-        const btnAdminTab = document.getElementById('btn-tab-admin');
-        const chatRoleAdminOpt = document.getElementById('chatRoleAdminOpt');
-        const badgeBtn = document.getElementById('adminStatusBtn');
-
-        if (isAdminAuthenticated) {
-            btnAdminTab.style.display = "block";
-            chatRoleAdminOpt.disabled = false;
-            badgeBtn.innerHTML = "🔓 สิทธิ์แอดมิน: เปิดใช้งาน";
-            badgeBtn.style.backgroundColor = "#48bb78";
-            logAccessAction("Localhost", "เปิดใช้งานสิทธิ์ผู้ดูแลระบบ (Admin Mode Active)");
-            alert("🔑 ปลดล็อกสิทธิ์แอดมินแล้ว! แท็บระบบแอดมิน (CMS) และการส่งข้อความสิทธิ์แอดมินพร้อมใช้งานแล้ว");
-        } else {
-            btnAdminTab.style.display = "none";
-            chatRoleAdminOpt.disabled = true;
-            document.getElementById('chatSenderRole').value = "ผู้ใช้ทั่วไป";
-            badgeBtn.innerHTML = "🔒 ตรวจสอบสิทธิ์แอดมิน";
-            badgeBtn.style.backgroundColor = "rgba(255, 255, 255, 0.2)";
-            if(document.getElementById('admin-tab').classList.contains('active')) {
-                switchTab('ipv4-tab', document.getElementById('btn-tab-ipv4'));
-            }
-        }
-    }
-
-    // ==========================================
-    // 1. ระบบคำนวณ IPv4 (IPv4 Calculator)
-    // ==========================================
-    function calculateIPv4() {
-        const input = document.getElementById('ipv4-input').value.trim();
-        const errorBox = document.getElementById('ipv4-error');
-        const resultBox = document.getElementById('ipv4-result');
-
-        errorBox.style.display = "none";
-        resultBox.style.display = "none";
-
-        if (!input) {
-            showError(errorBox, "กรุณากรอกข้อมูล IPv4 ก่อนทำการคำนวณ");
-            return;
-        }
-
-        // ตรวจสอบหากเป็นเลขฐานสองล้วนๆ เช่น 11000000.10101000.00000001.00000001
-        if (/^[01.]{35}$/.test(input)) {
-            const parts = input.split('.');
-            if (parts.length === 4) {
-                const ipNormal = parts.map(b => parseInt(b, 2)).join('.');
-                showIPv4Result("netmask-mode", "ผลการแปลงจากเลขฐานสอง", {
-                    "รูปแบบข้อความ": "แปลงเลขฐานสองเป็น IP ทศนิยมปกติ",
-                    "ผลลัพธ์ IP ทศนิยม": ipNormal,
-                    "ฐานสองเดิม": input
-                });
-                addHistoryRecord("type-netmask", `แปลงฐานสอง: ${ipNormal}`);
-                return;
-            }
-        }
-
-        // กรณีปกติ: เช็คแบบมี Subnet Mask (CIDR) หรือไม่ เช่น 192.168.1.5/24
-        const cidrMatch = input.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\/(\d{1,2})$/);
-        if (cidrMatch) {
-            const [_, o1, o2, o3, o4, prefixStr] = cidrMatch;
-            const prefix = parseInt(prefixStr);
-            if (o1>255 || o2>255 || o3>255 || o4>255 || prefix>32) {
-                showError(errorBox, "ตัวเลข IP หรือค่า Subnet Prefix (/0 ถึง /32) ไม่ถูกต้อง");
-                return;
-            }
-
-            // คำนวณหา Subnet Mask จาก Prefix
-            let maskBinary = "".padEnd(prefix, "1").padEnd(32, "0");
-            let m1 = parseInt(maskBinary.substr(0,8), 2);
-            let m2 = parseInt(maskBinary.substr(8,8), 2);
-            let m3 = parseInt(maskBinary.substr(16,8), 2);
-            let m4 = parseInt(maskBinary.substr(24,8), 2);
-            const subnetMask = `${m1}.${m2}.${m3}.${m4}`;
-
-            // คำนวณหา Network Address
-            let net1 = o1 & m1; let net2 = o2 & m2; let net3 = o3 & m3; let net4 = o4 & m4;
-            const networkAddress = `${net1}.${net2}.${net3}.${net4}`;
-
-            // คำนวณหา Broadcast Address
-            let bc1 = net1 | (255 - m1); let bc2 = net2 | (255 - m2); let bc3 = net3 | (255 - m3); let bc4 = net4 | (255 - m4);
-            const broadcastAddress = `${bc1}.${bc2}.${bc3}.${bc4}`;
-
-            // คำนวณจำนวน IP ที่ใช้ได้
-            const totalHosts = Math.pow(2, 32 - prefix);
-            const usableHosts = totalHosts > 2 ? totalHosts - 2 : 0;
-            
-            // หาช่วง IP ที่ใช้งานได้
-            let usableRange = "N/A";
-            if (usableHosts > 0) {
-                usableRange = `${net1}.${net2}.${net3}.${net4 + 1} ถึง ${bc1}.${bc2}.${bc3}.${bc4 - 1}`;
-            }
-
-            showIPv4Result("ip-mode", "วิเคราะห์โครงสร้าง IPv4 (CIDR)", {
-                "IP Address ที่ป้อน": `${o1}.${o2}.${o3}.${o4}`,
-                "Subnet Mask": `${subnetMask} (/${prefix})`,
-                "Network Address": networkAddress,
-                "Broadcast Address": broadcastAddress,
-                "ช่วง IP ที่ใช้งานได้ (Usable Host Range)": usableRange,
-                "จำนวนโฮสต์ทั้งหมดในระบบ": `${totalHosts.toLocaleString()} IPs (ใช้งานจริงได้ ${usableHosts.toLocaleString()} ตัว)`
-            });
-            addHistoryRecord("type-ipv4", `วิเคราะห์ CIDR: ${input}`);
-            return;
-        }
-
-        // กรณีเป็น IP ปกติไม่มี / เช่น 192.168.1.1 -> แปลงเป็นฐานสองให้ดู
-        const ipMatch = input.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
-        if (ipMatch) {
-            const [_, o1, o2, o3, o4] = ipMatch.map(Number);
-            if (o1>255 || o2>255 || o3>255 || o4>255) {
-                showError(errorBox, "เลขอ็อกเท็ตของ IP Address ต้องไม่เกิน 255");
-                return;
-            }
-            const b1 = o1.toString(2).padStart(8,'0');
-            const b2 = o2.toString(2).padStart(8,'0');
-            const b3 = o3.toString(2).padStart(8,'0');
-            const b4 = o4.toString(2).padStart(8,'0');
-
-            showIPv4Result("ip-mode", "แปลงรูปแบบ IPv4 เป็นเลขฐานสอง", {
-                "IP Address (ฐานสิบ)": `${o1}.${o2}.${o3}.${o4}`,
-                "รูปแบบเลขฐานสอง (Binary)": `${b1}.${b2}.${b3}.${b4}`,
-                "คลาสไอพี (Class คาดเดา)": o1 <= 127 ? "Class A" : o1 <= 191 ? "Class B" : o1 <= 223 ? "Class C" : "Class D/E"
-            });
-            addHistoryRecord("type-ipv4", `แปลงฐานสิบเป็นฐานสอง: ${input}`);
-            return;
-        }
-
-        showError(errorBox, "รูปแบบข้อมูล IPv4 ไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง");
-    }
-
-    function showIPv4Result(modeClass, title, dataObj) {
-        const box = document.getElementById('ipv4-result');
-        box.className = `result-box ${modeClass}`;
-        box.style.display = "block";
-        
-        let html = `<div class="result-title">🎯 ${title}</div>`;
-        for (let key in dataObj) {
-            html += `<div class="result-item"><strong>${key}:</strong> <span>${dataObj[key]}</span></div>`;
-        }
-        box.innerHTML = html;
-    }
-
-    // ==========================================
-    // 2. ระบบขยาย IPv6 (IPv6 Expanded)
-    // ==========================================
-    function calculateIPv6() {
-        const input = document.getElementById('ipv6-input').value.trim();
-        const errorBox = document.getElementById('ipv6-error');
-        const resultBox = document.getElementById('ipv6-result');
-
-        errorBox.style.display = "none";
-        resultBox.style.display = "none";
-
-        if (!input) {
-            showError(errorBox, "กรุณากรอกที่อยู่ IPv6 ก่อน");
-            return;
-        }
-
-        try {
-            let fullAddress = expandIPv6Address(input);
-            resultBox.className = "result-box ipv6-mode";
-            resultBox.style.display = "block";
-            resultBox.innerHTML = `
-                <div class="result-title">🎯 ผลลัพธ์การขยาย IPv6</div>
-                <div class="result-item"><strong>ค่าดั้งเดิมที่รับมา:</strong> <span>${input}</span></div>
-                <div class="result-item"><strong>รูปแบบเต็ม (Expanded):</strong> <span style="color:#8e24aa; font-family:monospace; font-weight:bold;">${fullAddress}</span></div>
-                <div class="result-item"><strong>โครงสร้างรวม:</strong> <span>ประกอบด้วย 8 กลุ่มย่อย (กลุ่มละ 16 บิต รวมเป็น 128 บิต)</span></div>
-            `;
-            addHistoryRecord("type-ipv6", `ขยาย IPv6: ${input}`);
-        } catch (e) {
-            showError(errorBox, e.message);
-        }
-    }
-
-    function expandIPv6Address(address) {
-        // ตรวจสอบความถูกต้องเบื้องต้น
-        if (!/^[0-9a-fA-F:]+$/.test(address) || address.includes(":::")) {
-            throw new Error("รูปแบบตัวอักษร IPv6 ไม่ถูกต้อง");
-        }
-
-        let parts = address.split(':');
-        
-        // จัดการกรณีที่มี :: อยู่ในข้อความ
-        if (address.includes("::")) {
-            const countDoubleColon = (address.match(/::/g) || []).length;
-            if (countDoubleColon > 1) throw new Error("ไม่สามารถใช้ '::' ซ้ำซ้อนเกิน 1 ครั้งได้");
-
-            let left = address.split("::")[0].split(":").filter(x => x !== "");
-            let right = address.split("::")[1].split(":").filter(x => x !== "");
-            let missingCount = 8 - (left.length + right.length);
-            
-            let middle = Array(missingCount).fill("0000");
-            parts = [...left, ...middle, ...right];
-        Part}
-
-        if (parts.length !== 8) {
-            throw new Error("ขนาดโครงสร้างของเลข IPv6 ขาดหรือเกิน 8 กลุ่มย่อย");
-        }
-
-        // แปลงทุกกลุ่มให้เติมศูนย์ข้างหน้าครบ 4 หลัก
-        return parts.map(part => {
-            if (part.length > 4) throw new Error("ข้อมูลในบางกลุ่มย่อยเกิน 4 หลัก Hex");
-            return part.toLowerCase().padStart(4, '0');
-        }).join(':');
-    }
-
-    function showError(box, msg) {
-        box.innerText = `⚠️ ข้อผิดพลาด: ${msg}`;
-        box.style.display = "block";
-    }
-
-    // ==========================================
-    // 3. ระบบแสดงผลข้อมูลและจัดการสายแลน (CMS UI)
-    // ==========================================
-    function renderCableContentData() {
-        const webTable = document.getElementById('webCableTableBody');
-        const adminTable = document.getElementById('adminCableControlBody');
-        
-        webTable.innerHTML = "";
-        adminTable.innerHTML = "";
-
-        cableDatabase.forEach((cable) => {
-            // แสดงเฉพาะที่เปิดให้เห็น (isVisible === true) บนหน้าเว็บผู้ใช้ทั่วไป
-            if (cable.isVisible) {
-                webTable.innerHTML += `
-                    <tr>
-                        <td><strong>${cable.name}</strong></td>
-                        <td>${cable.speed}</td>
-                        <td>${cable.bandwidth}</td>
-                        <td>${cable.distance}</td>
-                    </tr>
-                `;
-            }
-
-            // ส่วนของแอดมินแสดงทุกรายการและมีปุ่มควบคุม
-            adminTable.innerHTML += `
-                <tr>
-                    <td><strong>${cable.name}</strong></td>
-                    <td>${cable.speed}</td>
-                    <td><span class="badge-status ${cable.isVisible ? 'status-show' : 'status-hide'}">${cable.isVisible ? 'แสดง' : 'ซ่อน'}</span></td>
-                    <td>
-                        <button class="btn-action btn-toggle-view" onclick="toggleCableVisibility(${cable.id})">👁️ สลับสถานะ</button>
-                        <button class="btn-action btn-del" onclick="deleteCableRecord(${cable.id})">🗑️ ลบ</button>
-                    </td>
-                </tr>
-            `;
-        });
-    }
-
-    // ฟังก์ชันเพิ่มข้อมูลสายสัญญาณใหม่โดยแอดมิน
-    function addNewCableContent() {
-        const name = document.getElementById('admCatName').value.trim();
-        const speed = document.getElementById('admCatSpeed').value.trim();
-        const bandwidth = document.getElementById('admCatBandwidth').value.trim();
-        const distance = document.getElementById('admCatDistance').value.trim();
-
-        if (!name || !speed || !bandwidth || !distance) {
-            alert("กรุณากรอกข้อมูลสายเครือข่ายใหม่ให้ครบทุกช่องก่อนกดบันทึก!");
-            return;
-        }
-
-        const newId = cableDatabase.length > 0 ? Math.max(...cableDatabase.map(o => o.id)) + 1 : 1;
-        cableDatabase.push({ id: newId, name, speed, bandwidth, distance, isVisible: true });
-        
-        // ล้างค่าในช่องรับข้อมูล
-        document.getElementById('admCatName').value = "";
-        document.getElementById('admCatSpeed').value = "";
-        document.getElementById('admCatBandwidth').value = "";
-        document.getElementById('admCatDistance').value = "";
-
-        renderCableContentData();
-        logAccessAction("CMS", `เพิ่มสายสัญญาณประเภทใหม่สำเร็จ: ${name}`);
-        alert(`💾 เพิ่มข้อมูลสายเครือข่าย ${name} เรียบร้อยแล้ว`);
-    }
-
-    function toggleCableVisibility(id) {
-        const target = cableDatabase.find(c => c.id === id);
-        if (target) {
-            target.isVisible = !target.isVisible;
-            renderCableContentData();
-            logAccessAction("CMS", `เปลี่ยนการมองเห็นของ ${target.name} เป็น: ${target.isVisible ? 'แสดงผล' : 'ซ่อนไว้'}`);
-        }
-    }
-
-    function deleteCableRecord(id) {
-        const target = cableDatabase.find(c => c.id === id);
-        if (target && confirm(`คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลของ ${target.name} ออกถาวร?`)) {
-            cableDatabase = cableDatabase.filter(c => c.id !== id);
-            renderCableContentData();
-            logAccessAction("CMS", `ลบข้อมูลสายสัญญาณ ID: ${id}`);
-        }
-    }
-
-    // ==========================================
-    // 4. ระบบจัดการสมาชิกและบันทึกล็อก (Access Logs)
-    // ==========================================
     function renderActiveUsersData() {
-        const tbody = document.getElementById('adminUsersTableBody');
-        tbody.innerHTML = "";
-        activeUsersDatabase.forEach(u => {
-            tbody.innerHTML += `
-                <tr>
-                    <td style="font-family:monospace;">${u.ip}</td>
-                    <td style="font-size:12px; text-align:left;">${u.agent}</td>
-                    <td><button class="btn-action btn-del" onclick="banSimulatedUserIP('${u.ip}')">🚫 แบนผู้ใช้</button></td>
-                </tr>
-            `;
+        const body = document.getElementById('adminUsersTableBody');
+        body.innerHTML = "";
+        if(activeUsersDatabase.length === 0) {
+            body.innerHTML = `<tr><td colspan="3" style="color:#a0aec0; padding:10px;">ไม่มีผู้ใช้คนอื่นออนไลน์อยู่ในขณะนี้</td></tr>`;
+            return;
+        }
+        activeUsersDatabase.forEach((user, index) => {
+            body.innerHTML += `<tr>
+                <td><strong>${user.ip}</strong></td>
+                <td>${user.agent}</td>
+                <td><button class="btn-action btn-del" onclick="banUserIP('${user.ip}', ${index})">🚫 แบน IP</button></td>
+            </tr>`;
         });
     }
 
-    function banSimulatedUserIP(ip) {
-        if(confirm(`คุณต้องการจำลองการเตะและแบนที่อยู่ IP: ${ip} ใช่หรือไม่?`)) {
-            activeUsersDatabase = activeUsersDatabase.filter(user => user.ip !== ip);
+    function banUserIP(ip, index) {
+        if(confirm(`⚠️ คุณแน่ใจใช่ไหมที่จะทำตัดสิทธิ์และ "แบน IP: ${ip}" ออกจากระบบถาวร?`)) {
+            logAccessAction("SYSTEM", `ทำการแบนไอพีหมายเลข [ ${ip} ] สำเร็จ`);
+            activeUsersDatabase.splice(index, 1);
             renderActiveUsersData();
-            logAccessAction("FIREWALL", `แบนและจำกัดสิทธิ์การเข้าถึงของ IP: ${ip}`);
-            alert(`🚫 บันทึกกฎไฟร์วอลล์ สั่งบล็อก IP: ${ip} สำเร็จ`);
+            alert(`🔒 ทำการสั่งแบนไอพี ${ip} เรียบร้อยแล้ว`);
         }
-    }
-
-    function logAccessAction(operator, actionText) {
-        const logBox = document.getElementById('adminAccessLogs');
-        const timeNow = new Date().toLocaleTimeString();
-        logBox.innerHTML += `<div>[${timeNow}] <span style="color:#d97706;font-weight:bold;">[${operator}]</span> ${actionText}</div>`;
-        logBox.scrollTop = logBox.scrollHeight;
     }
 
     function publishAnnouncement() {
-        const text = document.getElementById('admAnnounceInput').value.trim();
-        const banner = document.getElementById('topAnnouncementBanner');
-        const bannerText = document.getElementById('announcementText');
-
-        if (!text) {
-            alert("กรุณากรอกรายละเอียดเพื่อประกาศ");
-            return;
-        }
-
-        bannerText.innerText = `📢 ประกาศระบบ: ${text}`;
-        banner.style.display = "flex";
+        const msg = document.getElementById('admAnnounceInput').value.trim();
+        if(!msg) { alert("กรุณาใส่ข้อความประกาศ"); return; }
+        document.getElementById('announcementText').innerText = "📢 " + msg;
+        document.getElementById('topAnnouncementBanner').style.display = "flex";
+        logAccessAction("ADMIN", `แก้ไขข้อความประกาศส่วนหัว: "${msg}"`);
         document.getElementById('admAnnounceInput').value = "";
-        logAccessAction("ANNOUNCE", `เปลี่ยนป้ายประกาศเว็บเป็น: "${text}"`);
     }
 
     function dispatchAdminEmail() {
-        const target = document.getElementById('admEmailTarget').value.trim();
+        const email = document.getElementById('admEmailTarget').value.trim();
         const content = document.getElementById('admEmailContent').value.trim();
-
-        if (!target || !content) {
-            alert("กรุณาระบุอีเมลเป้าหมายและเนื้อหาจดหมายข่าวให้ครบถ้วน");
-            return;
-        }
-
-        logAccessAction("MAILER", `ส่งอีเมลจดหมายข่าวไปยัง ${target}`);
-        alert(`🚀 [ระบบเครือข่ายจำลอง] ทำการส่งข้อมูลไปยัง ${target} สำเร็จแล้ว!\n(จำลองสถานะ: SMTP 200 OK)`);
+        if(!email || !content) { alert("กรุณากรอกข้อมูลเมลปลายทางและเนื้อหาให้ครบถ้วน"); return; }
+        
+        alert(`📧 ส่งจดหมายข่าวจำลองสำเร็จ!\nTo: ${email}\nStatus: Sent via Mail Server`);
+        logAccessAction("ADMIN", `ส่งอีเมลจดหมายข่าวไปยังกล่องข้อความ: ${email}`);
         document.getElementById('admEmailTarget').value = "";
         document.getElementById('admEmailContent').value = "";
     }
 
-    // ==========================================
-    // 5. ระบบ Live Chat สื่อสารจำลอง (Interactive)
-    // ==========================================
     function sendChatMessage() {
-        const input = document.getElementById('chatMessageInput');
-        const msg = input.value.trim();
-        const role = document.getElementById('chatSenderRole').value;
+        const msgInput = document.getElementById('chatMessageInput');
+        const message = msgInput.value.trim();
+        if(!message) return;
+
+        let senderName = "";
+        let msgClass = "";
+
+        if (isAdminAuthenticated) {
+            senderName = "🔑 แอดมินระบบ";
+            msgClass = "admin";
+        } else if (registeredChatSessionName !== "") {
+            senderName = `👤 ${registeredChatSessionName}`;
+            msgClass = "user";
+        } else {
+            alert("โปรดลงทะเบียนสมาชิกก่อนส่งข้อความ!");
+            return;
+        }
+
         const chatArea = document.getElementById('chatLogsArea');
-
-        if (!msg) return;
-
-        const isUser = (role === "ผู้ใช้ทั่วไป");
-        const bubbleClass = isUser ? "user" : "admin";
-        const senderTag = isUser ? "👤 คุณ" : "🔑 แอดมินระบบ";
-
-        chatArea.innerHTML += `
-            <div class="chat-msg ${bubbleClass}">
-                <strong>${senderTag}:</strong> ${msg}
-            </div>
-        `;
-
-        input.value = "";
+        const msgElement = document.createElement('div');
+        msgElement.className = `chat-msg ${msgClass}`;
+        msgElement.innerHTML = `<strong>${senderName}:</strong> ${message}`;
+        chatArea.appendChild(msgElement);
+        
+        logAccessAction(isAdminAuthenticated ? "ADMIN" : "CLIENT", `ส่งข้อความแชท: "${message}"`);
+        msgInput.value = "";
         chatArea.scrollTop = chatArea.scrollHeight;
+    }
 
-        // บอตช่วยตอบโต้อัตโนมัติในฝั่งออนไลน์ (Simulated Chat Bot Reply)
-        if (isUser) {
-            setTimeout(() => {
-                let botAnswer = "ได้รับข้อมูลแล้วค่ะ! หากมีปัญหาเรื่องการคำนวณซับเน็ต หรือมาตรฐานการเข้าหัวสาย LAN สอบถามทิ้งไว้ได้เลยนะคะ 🌐";
-                if(msg.toLowerCase().includes("ipv4") || msg.includes("คำนวณ")) {
-                    botAnswer = "หากต้องการคำนวณ IPv4 ลองกรอกเลข IP ตามด้วย /Prefix เช่น 192.168.1.0/24 ในแท็บแรกได้เลยนะคะ ระบบคำนวณออโต้ทันทีค่ะ";
-                } else if(msg.includes("สายแลน") || msg.includes("cat")) {
-                    botAnswer = "ปัจจุบันสาย LAN ที่นิยมสูงสุดในบ้านพักทั่วไปคือ Cat 6 รองรับความเร็ว 10 Gbps ในระยะทางสั้น และมาตรฐานการต่อส่วนใหญ่คือ T568B ค่ะ";
-                }
-                chatArea.innerHTML += `
-                    <div class="chat-msg user" style="background-color: #ebf8ff; border-left: 3px solid #3182ce;">
-                        <strong>🤖 บอตช่วยเหลือ:</strong> ${botAnswer}
-                    </div>
+    // ฟังก์ชันเปิด/ตรวจสอบสิทธิ์แอดมิน (ปรับปรุงระบบตรวจเช็คอีเมลแอดมินโดยตรง)
+    function toggleAdminAccess() {
+        if (!isAdminAuthenticated) {
+            let emailInput = prompt("🔒 กรุณากรอกอีเมลผู้ดูแลระบบเพื่อตรวจสอบสิทธิ์ (Admin Email):");
+            
+            // ตรวจเช็คว่าอีเมลตรงกับบัญชีแอดมินที่กำหนดไว้หรือไม่
+            if (emailInput !== null && emailInput.trim() === "stu69319011814") {
+                isAdminAuthenticated = true;
+                alert("✅ ยืนยันสิทธิ์แอดมินสำเร็จ! เมนูระบบแอดมิน (CMS) พร้อมฟังก์ชันแชทแอดมินเปิดใช้งานแล้ว");
+                document.getElementById('btn-tab-admin').style.display = "block";
+                document.getElementById('adminStatusBtn').innerHTML = "🔓 บัญชีแอดมินล็อกอินอยู่";
+                document.getElementById('adminStatusBtn').style.backgroundColor = "#8b5cf6";
+                document.getElementById('chatRoleAdminOpt').disabled = false;
+                logAccessAction("127.0.0.1", "แอดมินยืนยันสิทธิ์ผ่านอีเมลสำเร็จ");
+            } else if (emailInput !== null) {
+                alert("❌ อีเมลไม่ถูกต้อง! ปฏิเสธการเข้าถึงส่วนกลางของผู้ดูแลระบบ");
+            }
+        } else {
+            let logoutConfirm = confirm("คุณต้องการออกจากระบบเซสชันแอดมินใช่หรือไม่?");
+            if (logoutConfirm) {
+                isAdminAuthenticated = false;
+                document.getElementById('btn-tab-admin').style.display = "none";
+                document.getElementById('adminStatusBtn').innerHTML = "🔒 ตรวจสอบสิทธิ์แอดมิน";
+                document.getElementById('adminStatusBtn').style.backgroundColor = "rgba(255, 255, 255, 0.2)";
+                document.getElementById('chatRoleAdminOpt').disabled = true;
+                document.getElementById('chatSenderRole').value = "ผู้ใช้ทั่วไป";
+                switchTab('ipv4-tab', document.getElementById('btn-tab-ipv4'));
+                logAccessAction("127.0.0.1", "แอดมินออกจากระบบเซสชัน");
+            }
+        }
+    }
+
+    function renderKnowledgeContentData() {
+        const webContainer = document.getElementById('dynamicKnowledgeContainer');
+        const adminTableBody = document.getElementById('adminKnowledgeControlBody');
+        
+        webContainer.innerHTML = "";
+        adminTableBody.innerHTML = "";
+
+        if(knowledgeDatabase.length === 0) {
+            webContainer.innerHTML = `<p style='color:#a0aec0; text-align:center;'>ขณะนี้คลังข้อมูลว่างเปล่า รอการเขียนเนื้อหาจากแอดมิน...</p>`;
+        }
+
+        knowledgeDatabase.forEach(item => {
+            if (item.isVisible) {
+                let cardHTML = `<div class="info-card" style="border-left: 5px solid #2a5298;">
+                    <h4 style="font-size:16px; margin-bottom:5px; color:#1e3c72;">📝 ${item.title}</h4>
+                    <p style="font-size:14px; color:#2d3748; line-height:1.6; white-space: pre-wrap;">${item.content}</p>
+                </div>`;
+                webContainer.innerHTML += cardHTML;
+            }
+
+            let statusBadge = item.isVisible ? 
+                `<span class="badge-status status-show">เปิดแสดงผล</span>` : 
+                `<span class="badge-status status-hide">ปิดซ่อน</span>`;
+                
+            let toggleBtnText = item.isVisible ? "👁️‍🗨️ ปิดโชว์" : "👁️ เปิดโชว์";
+
+            let adminRow = `<tr>
+                <td style="text-align:left; max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><strong>${item.title}</strong></td>
+                <td>${statusBadge}</td>
+                <td>
+                    <button class="btn-action btn-toggle-view" onclick="toggleKnowledgeVisibility(${item.id})">${toggleBtnText}</button>
+                    <button class="btn-action btn-del" onclick="deleteKnowledgeItem(${item.id})">🗑️ ลบ</button>
+                </td>
+            </tr>`;
+            adminTableBody.innerHTML += adminRow;
+        });
+    }
+
+    function saveDynamicContent() {
+        const title = document.getElementById('admDocTitle').value.trim();
+        const content = document.getElementById('admDocContent').value.trim();
+
+        if (!title || !content) {
+            alert("⚠️ ปฏิเสธการบันทึก! กรุณากรอกทั้งหัวข้อหลักและเนื้อหาข้อความให้เรียบร้อย");
+            return;
+        }
+
+        let newId = knowledgeDatabase.length > 0 ? Math.max(...knowledgeDatabase.map(o => o.id)) + 1 : 1;
+        knowledgeDatabase.push({ id: newId, title: title, content: content, isVisible: true });
+
+        document.getElementById('admDocTitle').value = "";
+        document.getElementById('admDocContent').value = "";
+
+        alert(`✨ ทำการอัปเดตบทความเรื่อง "${title}" ลงในคลังข้อมูลเรียบร้อยแล้ว!`);
+        logAccessAction("ADMIN", `เพิ่มข้อมูลเรื่องใหม่เข้าไปในคลัง: ${title}`);
+        renderKnowledgeContentData();
+    }
+
+    function toggleKnowledgeVisibility(id) {
+        let index = knowledgeDatabase.findIndex(x => x.id === id);
+        if (index !== -1) {
+            knowledgeDatabase[index].isVisible = !knowledgeDatabase[index].isVisible;
+            logAccessAction("ADMIN", `เปลี่ยนสถานะการมองเห็นคลังข้อมูล ID: ${id}`);
+            renderKnowledgeContentData();
+        }
+    }
+
+    function deleteKnowledgeItem(id) {
+        if(confirm("คุณแน่ใจใช่หรือไม่ที่จะทำการลบเนื้อหาบทความชิ้นนี้ออกจากฐานคลังข้อมูลถาวร?")) {
+            knowledgeDatabase = knowledgeDatabase.filter(x => x.id !== id);
+            logAccessAction("ADMIN", `ลบเนื้อหาข้อมูลออกจากฐานระบบ: ID ${id}`);
+            renderKnowledgeContentData();
+        }
+    }
+
+    function switchTab(tabId, element) {
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        element.classList.add('active');
+        logAccessAction("CLIENT", `ผู้ใช้เปลี่ยนไปเปิดใช้งานแท็บเมนู: ${tabId}`);
+    }
+
+    function showError(element, message) {
+        element.innerHTML = message;
+        element.style.display = 'block';
+    }
+
+    function addRecordToHistory(inputType, inputData, summaryInfo, resultBoxHTML, modeClassName) {
+        const historyList = document.getElementById('history-list');
+        const noHistory = historyList.querySelector('.no-history');
+        if (noHistory) noHistory.remove();
+
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('th-TH') + ' น.';
+        const recordId = 'rec_' + Date.now();
+
+        cachedHistoryRecords.push({ id: recordId, tabType: (inputType === 'ipv6') ? 'ipv6' : 'ipv4', modeClass: modeClassName, html: resultBoxHTML });
+        let typeClass = (inputType === 'netmask') ? 'type-netmask' : (inputType === 'ipv4') ? 'type-ipv4' : 'type-ipv6';
+
+        const item = document.createElement('div');
+        item.className = `history-item ${typeClass}`;
+        item.innerHTML = `
+            <div>
+                <strong>📥 อินพุต:</strong> ${inputData} | 📝 สรุป: ${summaryInfo} <span style="color:#888; font-size:11px;">(${timeString})</span>
+            </div>
+            <button class="btn-view-old-record" onclick="loadOldRecord('${recordId}')">ดูย้อนหลัง</button>
+        `;
+        historyList.insertBefore(item, historyList.firstChild);
+        logAccessAction("CALCULATOR", `ประมวลผลคำนวณข้อมูลเครือข่ายสำเร็จ (${summaryInfo})`);
+    }
+
+    function loadOldRecord(recordId) {
+        const record = cachedHistoryRecords.find(r => r.id === recordId);
+        if (!record) return;
+
+        if (record.tabType === 'ipv4') {
+            switchTab('ipv4-tab', document.getElementById('btn-tab-ipv4'));
+            const resBox = document.getElementById('ipv4-result');
+            resBox.className = 'result-box ' + record.modeClass;
+            resBox.innerHTML = record.html;
+            resBox.style.display = 'block';
+            document.getElementById('ipv4-error').style.display = 'none';
+        } else {
+            switchTab('ipv6-tab', document.getElementById('btn-tab-ipv6'));
+            const resBox = document.getElementById('ipv6-result');
+            resBox.className = 'result-box ' + record.modeClass;
+            resBox.innerHTML = record.html;
+            resBox.style.display = 'block';
+            document.getElementById('ipv6-error').style.display = 'none';
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function clearHistory() {
+        document.getElementById('history-list').innerHTML = `<div class="no-history">ยังไม่มีประวัติการคำนวณในเซสชันนี้</div>`;
+        cachedHistoryRecords = [];
+    }
+
+    // ==========================================
+    // ส่วนคำนวณ IPv4 ที่นำตรรกะและวิธีคิดของคุณกลับมาแสดงผลเต็มรูปแบบ
+    // ==========================================
+    function calculateIPv4() {
+        const inputElement = document.getElementById('ipv4-input');
+        const resultBox = document.getElementById('ipv4-result');
+        const errorBox = document.getElementById('ipv4-error');
+        
+        resultBox.style.display = 'none';
+        errorBox.style.display = 'none';
+        const content = inputElement.value.replace(/\s/g, "");
+
+        if (!content) { showError(errorBox, "กรุณากรอกข้อมูลอินพุต"); return; }
+
+        // 1. ตรวจสอบรูปแบบ Binary (Netmask / IP)
+        if (/^[01.]+$/.test(content) && content.split('.').length === 4) {
+            const parts = content.split('.');
+            let calculationSteps = "";
+            let totalOnes = 0;
+            let isNetmask = true;
+            let previousBit = '1';
+
+            const decimalParts = parts.map((part) => {
+                const bits = part.split('');
+                const weights = [128, 64, 32, 16, 8, 4, 2, 1];
+                let sum = 0;
+                let steps = [];
+                
+                bits.forEach((bit, i) => {
+                    if (isNetmask) {
+                        if (previousBit === '0' && bit === '1') isNetmask = false;
+                        if (bit === '1') totalOnes++;
+                        previousBit = bit;
+                    }
+                    if (bit === '1') {
+                        sum += weights[i];
+                        steps.push(weights[i]);
+                    }
+                });
+                calculationSteps += `📍 ${part} ➔ ${steps.join(' + ') || 0} = **${sum}**\n`;
+                return sum;
+            });
+
+            const ipResult = decimalParts.join('.');
+            
+            if (isNetmask && totalOnes > 0 && totalOnes <= 32) {
+                const usableHosts = totalOnes >= 31 ? 0 : Math.pow(2, 32 - totalOnes) - 2;
+                resultBox.className = 'result-box netmask-mode';
+                resultBox.innerHTML = `
+                    <div class="result-title">🎛️ Netmask Binary to Decimal</div>
+                    <div class="result-item">แปลงค่าหน้ากากเครือข่าย (Subnet Mask) จากฐานสองเป็นฐานสิบ</div>
+                    <div class="result-item"><strong>📥 Binary Input:</strong> ${content}</div>
+                    <div class="result-item"><strong>🧮 Calculation:</strong><div class="result-block-step">${calculationSteps}</div></div>
+                    <div class="result-item"><strong>📤 Subnet Mask:</strong> <b>${ipResult}</b></div>
+                    <div class="result-item"><strong>🔌 Prefix Length:</strong> <b>/${totalOnes}</b></div>
+                    <div class="result-item"><strong>🖥️ Usable Hosts:</strong> <b>${usableHosts.toLocaleString()}</b> Hosts</div>
                 `;
-                chatArea.scrollTop = chatArea.scrollHeight;
-            }, 800);
+                resultBox.style.display = 'block';
+                addRecordToHistory('netmask', content, `Subnet Mask: ${ipResult}`, resultBox.innerHTML, 'netmask-mode');
+            } else {
+                const first = decimalParts[0];
+                let ipClass = getIpClass(first);
+                resultBox.className = 'result-box ip-mode';
+                resultBox.innerHTML = `
+                    <div class="result-title">🖥️ Binary to Decimal Result</div>
+                    <div class="result-item"><strong>📥 Binary Input:</strong> ${content}</div>
+                    <div class="result-item"><strong>🧮 Calculation:</strong><div class="result-block-step">${calculationSteps}</div></div>
+                    <div class="result-item"><strong>📤 Result IP:</strong> <b>${ipResult}</b></div>
+                    <div class="result-item"><strong>📂 Class:</strong> <b>${ipClass}</b></div>
+                `;
+                resultBox.style.display = 'block';
+                addRecordToHistory('ipv4', content, `แปลงได้ IP: ${ipResult} (${ipClass})`, resultBox.innerHTML, 'ip-mode');
+            }
+
+        // 2. ตรวจสอบรูปแบบ CIDR (เช่น 194.17.10.0/27)
+        } else if (/^(\d{1,3}\.){3}\d{1,3}\/([0-9]|[1-2][0-9]|3[0-2])$/.test(content)) {
+            const [ip, mask] = content.split('/');
+            const ipParts = ip.split('.').map(Number);
+            const prefix = parseInt(mask);
+
+            if (ipParts.some(num => num > 255)) { showError(errorBox, "ค่า Octet ใน IP ห้ามเกิน 255"); return; }
+
+            const firstOctet = ipParts[0];
+            let defaultPrefix = 8;
+            let ipClass = getIpClass(firstOctet);	
+
+            if (firstOctet >= 1 && firstOctet <= 126) { defaultPrefix = 8; }
+            else if (firstOctet >= 128 && firstOctet <= 191) { defaultPrefix = 16; }
+            else if (firstOctet >= 192 && firstOctet <= 223) { defaultPrefix = 24; }
+
+            const binaryMaskString = "1".repeat(prefix) + "0".repeat(32 - prefix);
+            const binaryMaskParts = binaryMaskString.match(/.{1,8}/g);
+            const formattedBinaryMask = binaryMaskParts.join('.');
+
+            const subnetBits = prefix > defaultPrefix ? prefix - defaultPrefix : 0;
+            const hostBits = 32 - prefix;
+
+            const totalSubnets = Math.pow(2, subnetBits);
+            const totalHostsPerSubnet = Math.pow(2, hostBits);
+
+            const activeOctetIndex = Math.floor((prefix - 1) / 8); 
+            const targetBinaryOctet = binaryMaskParts[activeOctetIndex] || "00000000";
+            
+            const weights = [128, 64, 32, 16, 8, 4, 2, 1];
+            let octetCalculationSteps = `**รายละเอียดวิธีคิดในไบต์ย่อยที่มีการยืมบิต:**\n`;
+            octetCalculationSteps += `• ค่าประจำตำแหน่ง:  128   64   32   16    8    4    2    1\n`;
+            octetCalculationSteps += `• บิตที่ตรงตำแหน่ง:   ${targetBinaryOctet.split('').join('    ')} \n`;
+            
+            let sumSteps = [];
+            targetBinaryOctet.split('').forEach((bit, i) => {
+                if (bit === '1') sumSteps.push(weights[i]);
+            });
+            octetCalculationSteps += `• รวมค่า: ${sumSteps.join(' + ') || 0} = **${sumSteps.reduce((a, b) => a + b, 0)}**`;
+
+            const maskLong = (prefix === 0) ? 0 : (0xFFFFFFFF << (32 - prefix)) >>> 0;
+            const subnetMask = [(maskLong >>> 24) & 0xFF, (maskLong >>> 16) & 0xFF, (maskLong >>> 8) & 0xFF, maskLong & 0xFF].join('.');
+            const ipLong = ((ipParts[0] << 24) | (ipParts[1] << 16) | (ipParts[2] << 8) | ipParts[3]) >>> 0;
+            const networkLong = (ipLong & maskLong) >>> 0;
+            const broadcastLong = (networkLong | (~maskLong >>> 0)) >>> 0;
+
+            const toIp = (num) => [(num >>> 24) & 0xFF, (num >>> 16) & 0xFF, (num >>> 8) & 0xFF, num & 0xFF].join('.');
+            
+            const usableHosts = prefix >= 31 ? 0 : totalHostsPerSubnet - 2;
+            const hostRange = prefix >= 31 ? "N/A" : `${toIp(networkLong + 1)} - ${toIp(broadcastLong - 1)}`;
+
+            resultBox.className = 'result-box ip-mode';
+            resultBox.innerHTML = `
+                <div class="result-title">🌐 CIDR Subnet Deep Calculation</div>
+                <div class="result-item">วิเคราะห์และคำนวณเครือข่ายจากอินพุต <b>${content}</b> (${ipClass})</div>
+                <div class="result-item"><strong>📝 1) แปลง Prefix เป็นฐานสอง (32 บิต):</strong><div class="result-block-step">${formattedBinaryMask}\n➔ มีเลข 1 ทั้งหมด ${prefix} ตัว และเลข 0 ทั้งหมด ${hostBits} ตัว</div></div>
+                <div class="result-item"><strong>📊 2) คำนวณหาจำนวน Subnet และ Host:</strong><div class="result-block-step">• บิตที่ยืมมาทำ Subnet มีจำนวน ${subnetBits} บิต ➔ สูตร 2^${subnetBits} = ${totalSubnets} Subnets\n• บิตที่เหลือทำ Host มีจำนวน ${hostBits} บิต ➔ สูตร 2^${hostBits} = ${totalHostsPerSubnet} Hosts (ใช้งานได้จริง: ${usableHosts})</div></div>
+                <div class="result-item"><strong>🧮 3) คำนวณหน้ากากเครือข่าย (Subnet Mask):</strong><div class="result-block-step">${octetCalculationSteps}</div></div>
+                <div class="result-item"><strong>📋 4) สรุปข้อมูลเครือข่าย (Network Summary):</strong><div class="result-block-step">• Subnet Mask: ${subnetMask}\n• Network IP: ${toIp(networkLong)}\n• Broadcast IP: ${toIp(broadcastLong)}\n• Host Range: ${hostRange}</div></div>
+            `;
+            resultBox.style.display = 'block';
+            addRecordToHistory('ipv4', content, `CIDR คำนวณเสร็จสิ้น (${ipClass})`, resultBox.innerHTML, 'ip-mode');
+
+        // 3. ตรวจสอบรูปแบบปกติ (IP ปกติแปลงเป็น Binary)
+        } else if (/^(\d{1,3}\.){3}\d{1,3}$/.test(content)) {
+            const ipParts = content.split('.').map(Number);
+            if (ipParts.some(num => num > 255)) { showError(errorBox, "ค่า Octet ห้ามเกิน 255"); return; }
+
+            const binaryResult = ipParts.map(p => p.toString(2).padStart(8, '0')).join('.');
+            const firstOctet = ipParts[0];
+            let ipClass = getIpClass(firstOctet);
+
+            resultBox.className = 'result-box ip-mode';
+            resultBox.innerHTML = `
+                <div class="result-title">🖥px; IPv4 to Binary Conversion</div>
+                <div class="result-item"><strong>📥 Decimal Input:</strong> <code>${content}</code> (📂 Class: <b>${ipClass}</b>)</div> 
+                <div class="result-item"><strong>📤 Binary Output:</strong> <code>${binaryResult}</code></div>
+            `;
+            resultBox.style.display = 'block';
+            addRecordToHistory('ipv4', content, `แปลงฐานสองสำเร็จ (${ipClass})`, resultBox.innerHTML, 'ip-mode');
+        } else {
+            showError(errorBox, "รูปแบบข้อมูล IPv4 ไม่ถูกต้อง");
         }
     }
 
     // ==========================================
-    // 6. ระบบบันทึกประวัติการใช้ (Session History)
+    // ส่วนคำนวณ IPv6 ขยายกลุ่มแบบ Full Format
     // ==========================================
-    function addHistoryRecord(typeClass, textDesc) {
-        const listEl = document.getElementById('history-list');
-        const noHist = listEl.querySelector('.no-history');
-        if (noHist) noHist.remove();
-
-        const timestamp = new Date().toLocaleTimeString();
-        const recordId = cachedHistoryRecords.length;
+    function calculateIPv6() {
+        const inputElement = document.getElementById('ipv6-input');
+        const resultBox = document.getElementById('ipv6-result');
+        const errorBox = document.getElementById('ipv6-error');
         
-        cachedHistoryRecords.push({ id: recordId, type: typeClass, desc: textDesc, time: timestamp });
+        resultBox.style.display = 'none';
+        errorBox.style.display = 'none';
+        let input = inputElement.value.trim();
 
-        const itemHtml = `
-            <div class="history-item ${typeClass}" id="record-item-${recordId}">
-                <div>
-                    <span style="font-weight:bold; color:#718096; margin-right:8px;">[${timestamp}]</span>
-                    <span>${textDesc}</span>
-                </div>
-                <button class="btn-view-old-record" onclick="alert('บันทึกเซสชันประจำครั้งนี้:\\n[เวลา] ${timestamp}\\n[รายละเอียด] ${textDesc}')">🔍 เปิดดู</button>
-            </div>
-        `;
-        listEl.insertAdjacentHTML('afterbegin', itemHtml);
-    }
+        if (!input) { showError(errorBox, "กรุณากรอกข้อมูล IPv6"); return; }
 
-    function clearHistory() {
-        if (confirm("คุณแน่ใจที่จะล้างประวัติการคำนวณทั้งหมดในเซสชันนี้?")) {
-            cachedHistoryRecords = [];
-            document.getElementById('history-list').innerHTML = `<div class="no-history">ยังไม่มีประวัติการคำนวณในเซสชันนี้</div>`;
-            logAccessAction("SYSTEM", "สั่งล้างข้อมูลประวัติคำนวณในหน้าสถิติ");
+        if (/^[0-9a-fA-F:]+$/.test(input) && input.includes(':')) {
+            let fullIP = input;
+            if (fullIP.includes('::')) {
+                const [left, right] = fullIP.split('::');
+                const leftParts = left ? left.split(':') : [];
+                const rightParts = right ? right.split(':') : [];
+                const missing = 8 - (leftParts.length + rightParts.length);
+                fullIP = [...leftParts, ...Array(missing).fill('0000'), ...rightParts].join(':');
+            }
+            const parts = fullIP.split(':');
+            if (parts.length === 8 && !parts.some(b => b.length > 4)) {
+                const expandedParts = parts.map(p => p.padStart(4, '0'));
+                let displayTable = "";
+                expandedParts.forEach((p, i) => { displayTable += `🔸 กลุ่มที่ ${i+1}: <code>${p}</code>\n`; });
+                
+                resultBox.className = 'result-box ipv6-mode';
+                resultBox.innerHTML = `
+                    <div class="result-title">🌐 IPv6 Expanded View</div>
+                    <div class="result-item"><strong>📥 Input:</strong> <code>${input}</code></div>
+                    <div class="result-item"><strong>🔢 เลขทั้ง 8 กลุ่ม:</strong><div class="result-block-step">${displayTable}</div></div>
+                    <div class="result-item"><strong>📤 Full Format:</strong> <code>${expandedParts.join(':')}</code></div>
+                `;
+                resultBox.style.display = 'block';
+                addRecordToHistory('ipv6', input, "ขยายเลข IPv6 สำเร็จ", resultBox.innerHTML, 'ipv6-mode');
+            } else {
+                showError(errorBox, "ความยาวกลุ่มย่อยหรือจำนวนกลุ่ม IPv6 ไม่ถูกต้อง");
+            }
+        } else {
+            showError(errorBox, "รูปแบบโครงสร้าง IPv6 ไม่ถูกต้อง");
         }
     }
 </script>
